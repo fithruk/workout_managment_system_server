@@ -1,2 +1,5 @@
-[phases.install]
-  cmds = ['npm install --legacy-peer-deps']
+[phases.setup]
+nixpkgs = ["nodejs", "nodePackages.typescript"]
+
+[start]
+cmd = "npm run start"
