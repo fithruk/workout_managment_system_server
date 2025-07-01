@@ -1,5 +1,5 @@
-[phases.setup]
-nixpkgs = ["nodejs", "nodePackages.typescript"]
-
-[start]
-cmd = "npm run start"
+[phases.build]
+cmds = [
+  "chmod +x ./node_modules/.bin/tsc",
+  "npm run build"
+]
