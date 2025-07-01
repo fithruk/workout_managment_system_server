@@ -1,11 +1,4 @@
-[phases.setup]
-cmds = [
-  "npm ci --omit=dev=false"
-]
-
 [phases.build]
 cmds = [
-  "ls -l ./node_modules/.bin/",
-  "chmod +x ./node_modules/.bin/tsc",
   "npm run build"
 ]
