@@ -23,8 +23,8 @@ Thumbs.db
 out/
 
 # Build
-dist/
-build/
+# dist/
+# build/
 
 # IDE
 .vscode/
