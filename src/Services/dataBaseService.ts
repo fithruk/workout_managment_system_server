@@ -1,0 +1,65 @@
+import { WorkoutsByPersoneTypes } from "../Types/types";
+import WorkoutsByPersoneModel from "../Models/workoutsByPersoneModel";
+import ApiError from "../Exeptions/apiExeption";
+import AbonementModel from "../Models/abonementModel";
+
+class DataBaseService {
+  public FeedWorkoutsByPersone = async (clients: WorkoutsByPersoneTypes) => {
+    await WorkoutsByPersoneModel.deleteMany({});
+    const newData = Object.entries(clients).map(([name, workoutDates]) => ({
+      name,
+      workoutDates,
+    }));
+
+    await WorkoutsByPersoneModel.insertMany(newData);
+  };
+
+  public GetWorkoutesDatesByName = async (name: string) => {
+    const sortedName = name
+      .split(" ")
+      .sort((a, b) => a.localeCompare(b))
+      .join(" ");
+
+    const candidate = await WorkoutsByPersoneModel.findOne({
+      name: sortedName,
+    });
+
+    if (!candidate)
+      throw ApiError.BadRequest(
+        `That name ${sortedName} does not exist in database`
+      );
+    return candidate.workoutDates;
+  };
+
+  public CreateNewAbonement = async (
+    name: string,
+    abonementDuration: number,
+    dateOfStart: Date
+  ) => {
+    const currentAbonement = await AbonementModel.findOne({ name });
+    if (currentAbonement) {
+      currentAbonement.abonementDuration =
+        +currentAbonement.abonementDuration + +abonementDuration;
+      currentAbonement.dateOfCreation = dateOfStart;
+      await currentAbonement.save();
+      return currentAbonement;
+    } else {
+      const newAbonement = await AbonementModel.create({
+        name,
+        abonementDuration,
+        dateOfCreation: dateOfStart,
+      });
+      return newAbonement;
+    }
+  };
+
+  public GetAllAbonements = async () => {
+    return await AbonementModel.find();
+  };
+
+  public GetApartAbonementByName = async (name: string) => {
+    return (await this.GetAllAbonements()).find((abon) => abon.name == name);
+  };
+}
+
+export default new DataBaseService();
