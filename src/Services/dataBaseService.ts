@@ -2,6 +2,9 @@ import { WorkoutsByPersoneTypes } from "../Types/types";
 import WorkoutsByPersoneModel from "../Models/workoutsByPersoneModel";
 import ApiError from "../Exeptions/apiExeption";
 import AbonementModel from "../Models/abonementModel";
+import { normalizeToUTCMinute } from "../Helpers/DataNormilize/dataNormilize";
+import workoutsByPersoneModel from "../Models/workoutsByPersoneModel";
+import dayjs from "dayjs";
 
 class DataBaseService {
   public FeedWorkoutsByPersone = async (clients: WorkoutsByPersoneTypes) => {
@@ -36,6 +39,8 @@ class DataBaseService {
     abonementDuration: number,
     dateOfStart: Date
   ) => {
+    const normalizedDate = normalizeToUTCMinute(dateOfStart);
+
     const currentAbonement = await AbonementModel.findOne({ name });
     if (currentAbonement) {
       currentAbonement.abonementDuration =
@@ -47,7 +52,7 @@ class DataBaseService {
       const newAbonement = await AbonementModel.create({
         name,
         abonementDuration,
-        dateOfCreation: dateOfStart,
+        dateOfCreation: new Date(normalizedDate),
       });
       return newAbonement;
     }
@@ -59,6 +64,28 @@ class DataBaseService {
 
   public GetApartAbonementByName = async (name: string) => {
     return (await this.GetAllAbonements()).find((abon) => abon.name == name);
+  };
+
+  public GetClientsByDate = async (date: Date) => {
+    const allClients = await workoutsByPersoneModel.find().lean();
+
+    return allClients
+      .filter((client) => {
+        const lastDateRaw = client.workoutDates[client.workoutDates.length - 1];
+        const lastDate = new Date(lastDateRaw as unknown as Date);
+
+        return dayjs(lastDate).isSame(dayjs(date), "day");
+      })
+      .map((client) => ({
+        clientName: client.name,
+        date: dayjs(
+          new Date(
+            client.workoutDates[
+              client.workoutDates.length - 1
+            ] as unknown as Date
+          )
+        ).toDate(),
+      }));
   };
 }
 

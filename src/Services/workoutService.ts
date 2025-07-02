@@ -1,7 +1,7 @@
 import ApiError from "../Exeptions/apiExeption";
 import WorkoutModel from "../Models/workoutModel";
 import workoutResultModel from "../Models/workoutResultModel";
-
+import { normalizeToUTCMinute } from "../Helpers/DataNormilize/dataNormilize";
 import {
   ExerciseType,
   WorkoutPlanType,
@@ -11,6 +11,9 @@ import {
 class WorkoutService {
   public SaveWorkoutPlan = async (plan: WorkoutPlanType) => {
     const { clientName, dateOfWorkout, workoutPlan } = plan;
+
+    const normalizedDate = normalizeToUTCMinute(plan.dateOfWorkout);
+
     const Wplan = await WorkoutModel.findOne({ clientName, dateOfWorkout });
     if (Wplan) {
       (Wplan.workoutPlan as ExerciseType[]) = workoutPlan;
@@ -19,14 +22,19 @@ class WorkoutService {
     }
 
     await WorkoutModel.create({
-      dateOfWorkout,
+      dateOfWorkout: new Date(normalizedDate),
       clientName,
       workoutPlan,
     });
   };
 
   public GetWorkoutPlan = async (dateOfWorkout: Date, clientName: string) => {
-    const Wplan = await WorkoutModel.findOne({ clientName, dateOfWorkout });
+    const normalizedDate = normalizeToUTCMinute(dateOfWorkout);
+
+    const Wplan = await WorkoutModel.findOne({
+      clientName,
+      dateOfWorkout: new Date(normalizedDate),
+    });
     if (!Wplan)
       throw ApiError.BadRequest(`Плану тренування на ${dateOfWorkout} немає`);
 
@@ -38,15 +46,17 @@ class WorkoutService {
     name: string,
     date: Date
   ) => {
+    const normalizedDate = normalizeToUTCMinute(date);
+
     const currentWorkout = await workoutResultModel.findOne({
       clientName: name,
-      dateOfWorkout: date,
+      dateOfWorkout: new Date(normalizedDate),
     });
 
     if (!currentWorkout) {
       const workout = await workoutResultModel.create({
         clientName: name,
-        dateOfWorkout: date,
+        dateOfWorkout: new Date(normalizedDate),
         workoutResult: workoutResult,
       });
       return workout;
@@ -61,9 +71,11 @@ class WorkoutService {
     clientName: string,
     dateOfWorkout: Date
   ) => {
+    const normalizedDate = normalizeToUTCMinute(dateOfWorkout);
+
     const currentWorkout = await workoutResultModel.findOne({
       clientName,
-      dateOfWorkout,
+      dateOfWorkout: new Date(normalizedDate),
     });
     if (!currentWorkout) return null;
     return currentWorkout;
@@ -147,7 +159,11 @@ class WorkoutService {
     clientName: string,
     dateOfWorkout: Date
   ) => {
-    return await WorkoutModel.findOne({ clientName, dateOfWorkout });
+    const normalizedDate = normalizeToUTCMinute(dateOfWorkout);
+    return await WorkoutModel.findOne({
+      clientName,
+      dateOfWorkout: new Date(normalizedDate),
+    });
   };
 }
 

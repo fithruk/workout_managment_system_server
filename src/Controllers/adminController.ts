@@ -49,10 +49,29 @@ class AdminController {
         abonementDuration,
         dateOfStart
       );
-      if (abonement) res.status(200).json({ abonement });
-      throw ApiError.BadRequest(
-        "Somethink went wrong while creating new abonement"
+      if (!abonement) {
+        throw ApiError.BadRequest(
+          "Something went wrong while creating new abonement"
+        );
+      }
+      res.status(200).json({ abonement });
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  public GetTodayClientsAbonements = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
+    try {
+      const { todaysDate } = req.params;
+      const abonements = await adminService.GetTodayClientsAbonements(
+        new Date(todaysDate)
       );
+
+      res.status(200).json(abonements);
     } catch (error) {
       next(error);
     }

@@ -51,6 +51,26 @@ class AdminService {
   public GetCurrentWorkoutPlan = async (name: string, date: Date) => {
     return await workoutService.GetCurrentWorkoutPlan(name, date);
   };
+
+  public GetTodayClientsAbonements = async (todaysDate: Date) => {
+    const [todaysClients, allAbonements] = await Promise.all([
+      dataBaseService.GetClientsByDate(todaysDate),
+      dataBaseService.GetAllAbonements(),
+    ]);
+
+    return allAbonements
+      .map((ab) => {
+        const client = todaysClients.find((cl) => cl.clientName === ab.name);
+        return client
+          ? {
+              clientName: client.clientName,
+              date: client.date,
+              ...(ab.toObject?.() ?? ab),
+            }
+          : null;
+      })
+      .filter(Boolean);
+  };
 }
 
 export default new AdminService();
