@@ -67,6 +67,7 @@ class AdminController {
   ) => {
     try {
       const { todaysDate }: { todaysDate: string } = req.body;
+      console.log("GetTodayClientsAbonements called");
 
       if (isNaN(new Date(todaysDate).getTime())) {
         console.log("shlyapa");
