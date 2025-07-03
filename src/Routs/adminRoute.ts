@@ -11,6 +11,7 @@ route.get(
 );
 route.post(
   "/GetTodayClientsAbonements",
+  adminMiddlaware,
   adminController.GetTodayClientsAbonements
 );
 route.post(

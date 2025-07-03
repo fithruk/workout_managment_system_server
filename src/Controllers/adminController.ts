@@ -66,7 +66,11 @@ class AdminController {
     next: NextFunction
   ) => {
     try {
-      const { todaysDate }: { todaysDate: Date } = req.body;
+      const { todaysDate }: { todaysDate: string } = req.body;
+
+      if (isNaN(new Date(todaysDate).getTime())) {
+        console.log("shlyapa");
+      }
 
       const abonements = await adminService.GetTodayClientsAbonements(
         new Date(todaysDate)
