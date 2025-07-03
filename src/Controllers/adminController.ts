@@ -66,7 +66,8 @@ class AdminController {
     next: NextFunction
   ) => {
     try {
-      const { todaysDate } = req.params;
+      const { todaysDate }: { todaysDate: Date } = req.body;
+
       const abonements = await adminService.GetTodayClientsAbonements(
         new Date(todaysDate)
       );

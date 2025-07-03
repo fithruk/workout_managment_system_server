@@ -58,18 +58,30 @@ class AdminService {
       dataBaseService.GetAllAbonements(),
     ]);
 
-    return allAbonements
+    const normalizeName = (name: string): string =>
+      name
+        .toLowerCase()
+        .trim()
+        .split(/\s+/) // разбиваем по пробелам (включая лишние)
+        .sort()
+        .join(" ");
+
+    const abonemetsForTable = allAbonements
       .map((ab) => {
-        const client = todaysClients.find((cl) => cl.clientName === ab.name);
-        return client
-          ? {
-              clientName: client.clientName,
-              date: client.date,
-              ...(ab.toObject?.() ?? ab),
-            }
-          : null;
+        const client = todaysClients.find(
+          (cl) => normalizeName(cl.clientName) === normalizeName(ab.name)
+        );
+        if (!client) return null;
+
+        return {
+          clientName: client.clientName,
+          date: client.date,
+          ...(ab.toObject?.() ?? ab),
+        };
       })
-      .filter(Boolean);
+      .filter((item): item is NonNullable<typeof item> => item !== null);
+
+    return abonemetsForTable;
   };
 }
 

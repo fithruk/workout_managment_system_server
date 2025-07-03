@@ -9,8 +9,8 @@ route.get(
   adminMiddlaware,
   adminController.GetCurrentWorkoutPlan
 );
-route.get(
-  "/GetTodayClientsAbonements/:todaysDate",
+route.post(
+  "/GetTodayClientsAbonements",
   adminController.GetTodayClientsAbonements
 );
 route.post(
