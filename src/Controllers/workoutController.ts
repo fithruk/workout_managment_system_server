@@ -51,10 +51,12 @@ class WorkoutController {
       }: { name: string; date: Date; workoutResult: SetsAndValuesResults } =
         req.body;
 
+      console.log(date);
+
       const workoutResponce = await workoutService.SaveWorkoutResults(
         workoutResult,
         name,
-        date
+        new Date(date)
       );
       res.status(200).json({ workoutResponce });
     } catch (error) {
