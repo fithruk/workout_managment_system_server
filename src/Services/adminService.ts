@@ -1,6 +1,8 @@
 import userService from "./userService";
 import dataBaseService from "./dataBaseService";
 import workoutService from "./workoutService";
+import dayjs from "dayjs";
+import { normalizeName } from "../Helpers/NormalizeName/normalizeName";
 
 class AdminService {
   public GetAllClients = async () => {
@@ -58,14 +60,6 @@ class AdminService {
       dataBaseService.GetAllAbonements(),
     ]);
 
-    const normalizeName = (name: string): string =>
-      name
-        .toLowerCase()
-        .trim()
-        .split(/\s+/) // разбиваем по пробелам (включая лишние)
-        .sort()
-        .join(" ");
-
     const abonemetsForTable = allAbonements
       .map((ab) => {
         const client = todaysClients.find(
@@ -82,6 +76,60 @@ class AdminService {
       .filter((item): item is NonNullable<typeof item> => item !== null);
 
     return abonemetsForTable;
+  };
+
+  public UpdateAbonements = async (names: string[]) => {
+    const allAbonements = await dataBaseService.GetAllAbonements();
+    const today = dayjs();
+
+    for (let index = 0; index < allAbonements.length; index++) {
+      const abonement = allAbonements[index];
+
+      if (!names.includes(normalizeName(abonement.name))) continue;
+
+      if (abonement.abonementDuration <= 0) {
+        console.log(
+          `[Пропуск] ${abonement.name}: абонемент уже израсходован (осталось 0 занятий)`
+        );
+        continue;
+      }
+
+      abonement.abonementDuration -= 1;
+      abonement.dateOfLastActivation = today.toDate();
+
+      const allWorkoutsByName = await dataBaseService.GetWorkoutesDatesByName(
+        abonement.name
+      );
+
+      const dateOfStartAbonement = dayjs(abonement.dateOfCreation);
+      const passedDays = today.diff(dateOfStartAbonement, "day");
+      const endOfRangeDate = dateOfStartAbonement.add(passedDays, "day");
+
+      const workoutsInDateRange = allWorkoutsByName.filter((date) => {
+        const workoutDate = new Date(date as unknown as Date);
+        return (
+          workoutDate >= dateOfStartAbonement.toDate() &&
+          workoutDate <= endOfRangeDate.toDate()
+        );
+      });
+
+      const completedWorkouts = workoutsInDateRange.length;
+      const oldDuration = abonement.abonementDuration + 1; // т.к. уже вычли выше
+
+      await abonement.save();
+
+      console.log(
+        `[Обновлён] ${abonement.name}:\n` +
+          ` - Старт абонемента: ${dateOfStartAbonement.format(
+            "YYYY-MM-DD"
+          )}\n` +
+          ` - Прошло дней: ${passedDays}\n` +
+          ` - Тренировок в диапазоне: ${completedWorkouts}\n` +
+          ` - Было занятий: ${oldDuration}, Осталось: ${abonement.abonementDuration}`
+      );
+    }
+
+    return allAbonements;
   };
 }
 

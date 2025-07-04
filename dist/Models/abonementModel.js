@@ -15,5 +15,8 @@ const abonementShema = new mongoose_1.Schema({
         type: Date,
         required: true,
     },
+    dateOfLastActivation: {
+        type: Date,
+    },
 });
 exports.default = (0, mongoose_1.model)("Abomement", abonementShema);

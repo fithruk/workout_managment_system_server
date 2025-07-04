@@ -9,6 +9,9 @@ route.get(
   adminMiddlaware,
   adminController.GetCurrentWorkoutPlan
 );
+
+route.put("/updateAbonements", adminController.UpdateAbonements);
+
 route.post(
   "/getTodayClientsAbonements",
   adminMiddlaware,

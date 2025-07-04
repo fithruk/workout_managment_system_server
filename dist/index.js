@@ -13,7 +13,6 @@ const workoutsRoute_1 = __importDefault(require("./Routs/workoutsRoute"));
 const mongoose_1 = __importDefault(require("mongoose"));
 const cors_1 = __importDefault(require("cors"));
 const errorMiddleware_1 = __importDefault(require("./Middlewares/errorMiddleware"));
-const CalculateAbonements_1 = require("./Crone/CalculateAbonements");
 const app = (0, express_1.default)();
 const PORT = process.env.PORT || 5000;
 app.use((0, cors_1.default)({
@@ -28,7 +27,7 @@ app.use("/admin", adminRoute_1.default);
 app.use("/exercises", exerciseRoute_1.default);
 app.use("/workouts", workoutsRoute_1.default);
 app.use(errorMiddleware_1.default);
-(0, CalculateAbonements_1.setupAbonementCron)();
+// setupAbonementCron();
 const start = async () => {
     try {
         await mongoose_1.default.connect(process.env.MONGO_DB_URL);

@@ -52,6 +52,16 @@ class AdminController {
                 next(error);
             }
         };
+        this.UpdateAbonements = async (req, res, next) => {
+            try {
+                const { names } = req.body;
+                const filteredAbonements = await adminService_1.default.UpdateAbonements(names);
+                res.status(200).json(filteredAbonements);
+            }
+            catch (error) {
+                next(error);
+            }
+        };
         this.GetTimeRangeWorkoutData = async (req, res, next) => {
             try {
                 const { dateOfRangeStart, dateOfRangeeEnd, clientName, } = req.body;

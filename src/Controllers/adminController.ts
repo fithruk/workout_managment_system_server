@@ -82,6 +82,21 @@ class AdminController {
     }
   };
 
+  UpdateAbonements = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
+    try {
+      const { names }: { names: string[] } = req.body;
+      const filteredAbonements = await adminService.UpdateAbonements(names);
+
+      res.status(200).json(filteredAbonements);
+    } catch (error) {
+      next(error);
+    }
+  };
+
   public GetTimeRangeWorkoutData = async (
     req: Request,
     res: Response,

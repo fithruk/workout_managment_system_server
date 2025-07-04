@@ -14,6 +14,9 @@ const abonementShema = new Schema({
     type: Date,
     required: true,
   },
+  dateOfLastActivation: {
+    type: Date,
+  },
 });
 
 export default model("Abomement", abonementShema);

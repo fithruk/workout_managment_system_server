@@ -1,6 +1,5 @@
 require("dotenv").config();
 import express from "express";
-import cron from "node-cron";
 import AuthRouter from "./Routs/authRoute";
 import DataBaseRouter from "./Routs/dataBaseRoute";
 import AdminRouter from "./Routs/adminRoute";
@@ -9,7 +8,6 @@ import WorkoutRouter from "./Routs/workoutsRoute";
 import mongoose from "mongoose";
 import cors from "cors";
 import errorMiddlaware from "./Middlewares/errorMiddleware";
-import { setupAbonementCron } from "./Crone/CalculateAbonements";
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -30,7 +28,7 @@ app.use("/exercises", ExerciseRouter);
 app.use("/workouts", WorkoutRouter);
 app.use(errorMiddlaware);
 
-setupAbonementCron();
+// setupAbonementCron();
 
 const start = async () => {
   try {
