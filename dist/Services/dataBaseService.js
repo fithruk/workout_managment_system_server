@@ -6,6 +6,9 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const workoutsByPersoneModel_1 = __importDefault(require("../Models/workoutsByPersoneModel"));
 const apiExeption_1 = __importDefault(require("../Exeptions/apiExeption"));
 const abonementModel_1 = __importDefault(require("../Models/abonementModel"));
+const dataNormilize_1 = require("../Helpers/DataNormilize/dataNormilize");
+const workoutsByPersoneModel_2 = __importDefault(require("../Models/workoutsByPersoneModel"));
+const dayjs_1 = __importDefault(require("dayjs"));
 class DataBaseService {
     constructor() {
         this.FeedWorkoutsByPersone = async (clients) => {
@@ -29,6 +32,7 @@ class DataBaseService {
             return candidate.workoutDates;
         };
         this.CreateNewAbonement = async (name, abonementDuration, dateOfStart) => {
+            const normalizedDate = (0, dataNormilize_1.normalizeToUTCMinute)(dateOfStart);
             const currentAbonement = await abonementModel_1.default.findOne({ name });
             if (currentAbonement) {
                 currentAbonement.abonementDuration =
@@ -41,7 +45,7 @@ class DataBaseService {
                 const newAbonement = await abonementModel_1.default.create({
                     name,
                     abonementDuration,
-                    dateOfCreation: dateOfStart,
+                    dateOfCreation: new Date(normalizedDate),
                 });
                 return newAbonement;
             }
@@ -51,6 +55,19 @@ class DataBaseService {
         };
         this.GetApartAbonementByName = async (name) => {
             return (await this.GetAllAbonements()).find((abon) => abon.name == name);
+        };
+        this.GetClientsByDate = async (date) => {
+            const allClients = await workoutsByPersoneModel_2.default.find().lean();
+            return allClients
+                .filter((client) => {
+                const lastDateRaw = client.workoutDates[client.workoutDates.length - 1];
+                const lastDate = new Date(lastDateRaw);
+                return (0, dayjs_1.default)(lastDate).isSame((0, dayjs_1.default)(date), "day");
+            })
+                .map((client) => ({
+                clientName: client.name,
+                date: (0, dayjs_1.default)(new Date(client.workoutDates[client.workoutDates.length - 1])).toDate(),
+            }));
         };
     }
 }

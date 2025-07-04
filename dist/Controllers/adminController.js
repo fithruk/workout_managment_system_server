@@ -30,9 +30,23 @@ class AdminController {
             try {
                 const { name, abonementDuration, dateOfStart, } = req.body;
                 const abonement = await adminService_1.default.CreateNewAbonement(name, abonementDuration, dateOfStart);
-                if (abonement)
-                    res.status(200).json({ abonement });
-                throw apiExeption_1.default.BadRequest("Somethink went wrong while creating new abonement");
+                if (!abonement) {
+                    throw apiExeption_1.default.BadRequest("Something went wrong while creating new abonement");
+                }
+                res.status(200).json({ abonement });
+            }
+            catch (error) {
+                next(error);
+            }
+        };
+        this.GetTodayClientsAbonements = async (req, res, next) => {
+            try {
+                const { todaysDate } = req.body;
+                if (isNaN(new Date(todaysDate).getTime())) {
+                    console.log("shlyapa");
+                }
+                const abonements = await adminService_1.default.GetTodayClientsAbonements(new Date(todaysDate));
+                res.status(200).json(abonements);
             }
             catch (error) {
                 next(error);

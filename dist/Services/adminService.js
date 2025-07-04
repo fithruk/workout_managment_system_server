@@ -34,6 +34,31 @@ class AdminService {
         this.GetCurrentWorkoutPlan = async (name, date) => {
             return await workoutService_1.default.GetCurrentWorkoutPlan(name, date);
         };
+        this.GetTodayClientsAbonements = async (todaysDate) => {
+            const [todaysClients, allAbonements] = await Promise.all([
+                dataBaseService_1.default.GetClientsByDate(todaysDate),
+                dataBaseService_1.default.GetAllAbonements(),
+            ]);
+            const normalizeName = (name) => name
+                .toLowerCase()
+                .trim()
+                .split(/\s+/) // разбиваем по пробелам (включая лишние)
+                .sort()
+                .join(" ");
+            const abonemetsForTable = allAbonements
+                .map((ab) => {
+                const client = todaysClients.find((cl) => normalizeName(cl.clientName) === normalizeName(ab.name));
+                if (!client)
+                    return null;
+                return {
+                    clientName: client.clientName,
+                    date: client.date,
+                    ...(ab.toObject?.() ?? ab),
+                };
+            })
+                .filter((item) => item !== null);
+            return abonemetsForTable;
+        };
     }
 }
 exports.default = new AdminService();
