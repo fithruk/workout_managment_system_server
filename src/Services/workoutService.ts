@@ -170,6 +170,8 @@ class WorkoutService {
     clientName: string,
     dateOfWorkout: Date
   ) => {
+    console.log(clientName + " GetCurrentWorkoutPlan");
+
     const start = new Date(dateOfWorkout);
     start.setHours(0, 0, 0, 0);
 
