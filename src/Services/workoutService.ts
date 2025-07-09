@@ -155,14 +155,33 @@ class WorkoutService {
     return combined;
   };
 
+  // public GetCurrentWorkoutPlan = async (
+  //   clientName: string,
+  //   dateOfWorkout: Date
+  // ) => {
+  //   const normalizedDate = normalizeToUTCMinute(dateOfWorkout);
+  //   return await WorkoutModel.findOne({
+  //     clientName,
+  //     dateOfWorkout: new Date(normalizedDate),
+  //   });
+  // };
+
   public GetCurrentWorkoutPlan = async (
     clientName: string,
     dateOfWorkout: Date
   ) => {
-    const normalizedDate = normalizeToUTCMinute(dateOfWorkout);
+    const start = new Date(dateOfWorkout);
+    start.setHours(0, 0, 0, 0);
+
+    const end = new Date(start);
+    end.setDate(end.getDate() + 1); // следующий день
+
     return await WorkoutModel.findOne({
       clientName,
-      dateOfWorkout: new Date(normalizedDate),
+      dateOfWorkout: {
+        $gte: start,
+        $lt: end,
+      },
     });
   };
 }
