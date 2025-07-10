@@ -9,12 +9,42 @@ import {
 } from "../Types/types";
 
 class WorkoutService {
+  // public SaveWorkoutPlan = async (plan: WorkoutPlanType) => {
+  //   const { clientName, dateOfWorkout, workoutPlan } = plan;
+
+  //   const normalizedDate = normalizeToUTCMinute(plan.dateOfWorkout);
+
+  //   const Wplan = await WorkoutModel.findOne({ clientName, dateOfWorkout });
+  //   if (Wplan) {
+  //     (Wplan.workoutPlan as ExerciseType[]) = workoutPlan;
+  //     await Wplan.save();
+  //     return;
+  //   }
+
+  //   await WorkoutModel.create({
+  //     dateOfWorkout: new Date(normalizedDate),
+  //     clientName,
+  //     workoutPlan,
+  //   });
+  // };
+
   public SaveWorkoutPlan = async (plan: WorkoutPlanType) => {
     const { clientName, dateOfWorkout, workoutPlan } = plan;
 
-    const normalizedDate = normalizeToUTCMinute(plan.dateOfWorkout);
+    const start = new Date(dateOfWorkout);
+    start.setHours(0, 0, 0, 0);
 
-    const Wplan = await WorkoutModel.findOne({ clientName, dateOfWorkout });
+    const end = new Date(start);
+    end.setDate(end.getDate() + 1); // следующий день
+
+    const Wplan = await WorkoutModel.findOne({
+      clientName,
+      dateOfWorkout: {
+        $gte: start,
+        $lt: end,
+      },
+    });
+
     if (Wplan) {
       (Wplan.workoutPlan as ExerciseType[]) = workoutPlan;
       await Wplan.save();
@@ -22,7 +52,7 @@ class WorkoutService {
     }
 
     await WorkoutModel.create({
-      dateOfWorkout: new Date(normalizedDate),
+      dateOfWorkout: new Date(dateOfWorkout),
       clientName,
       workoutPlan,
     });
