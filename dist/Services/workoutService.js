@@ -9,23 +9,49 @@ const workoutResultModel_1 = __importDefault(require("../Models/workoutResultMod
 const dataNormilize_1 = require("../Helpers/DataNormilize/dataNormilize");
 class WorkoutService {
     constructor() {
+        // public SaveWorkoutPlan = async (plan: WorkoutPlanType) => {
+        //   const { clientName, dateOfWorkout, workoutPlan } = plan;
+        //   const normalizedDate = normalizeToUTCMinute(plan.dateOfWorkout);
+        //   const Wplan = await WorkoutModel.findOne({ clientName, dateOfWorkout });
+        //   if (Wplan) {
+        //     (Wplan.workoutPlan as ExerciseType[]) = workoutPlan;
+        //     await Wplan.save();
+        //     return;
+        //   }
+        //   await WorkoutModel.create({
+        //     dateOfWorkout: new Date(normalizedDate),
+        //     clientName,
+        //     workoutPlan,
+        //   });
+        // };
         this.SaveWorkoutPlan = async (plan) => {
             const { clientName, dateOfWorkout, workoutPlan } = plan;
-            const normalizedDate = (0, dataNormilize_1.normalizeToUTCMinute)(plan.dateOfWorkout);
-            const Wplan = await workoutModel_1.default.findOne({ clientName, dateOfWorkout });
+            const start = new Date(dateOfWorkout);
+            start.setHours(0, 0, 0, 0);
+            const end = new Date(start);
+            end.setDate(end.getDate() + 1); // следующий день
+            const Wplan = await workoutModel_1.default.findOne({
+                clientName,
+                dateOfWorkout: {
+                    $gte: start,
+                    $lt: end,
+                },
+            });
+            console.log(Wplan);
             if (Wplan) {
                 Wplan.workoutPlan = workoutPlan;
                 await Wplan.save();
                 return;
             }
             await workoutModel_1.default.create({
-                dateOfWorkout: new Date(normalizedDate),
+                dateOfWorkout: new Date(dateOfWorkout),
                 clientName,
                 workoutPlan,
             });
         };
         this.GetWorkoutPlan = async (dateOfWorkout, clientName) => {
             const normalizedDate = (0, dataNormilize_1.normalizeToUTCMinute)(dateOfWorkout);
+            console.log(normalizedDate + " normalizedDate");
             const Wplan = await workoutModel_1.default.findOne({
                 clientName,
                 dateOfWorkout: new Date(normalizedDate),
@@ -125,11 +151,27 @@ class WorkoutService {
             ]);
             return combined;
         };
+        // public GetCurrentWorkoutPlan = async (
+        //   clientName: string,
+        //   dateOfWorkout: Date
+        // ) => {
+        //   const normalizedDate = normalizeToUTCMinute(dateOfWorkout);
+        //   return await WorkoutModel.findOne({
+        //     clientName,
+        //     dateOfWorkout: new Date(normalizedDate),
+        //   });
+        // };
         this.GetCurrentWorkoutPlan = async (clientName, dateOfWorkout) => {
-            const normalizedDate = (0, dataNormilize_1.normalizeToUTCMinute)(dateOfWorkout);
+            const start = new Date(dateOfWorkout);
+            start.setHours(0, 0, 0, 0);
+            const end = new Date(start);
+            end.setDate(end.getDate() + 1); // следующий день
             return await workoutModel_1.default.findOne({
                 clientName,
-                dateOfWorkout: new Date(normalizedDate),
+                dateOfWorkout: {
+                    $gte: start,
+                    $lt: end,
+                },
             });
         };
     }

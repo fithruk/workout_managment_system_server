@@ -45,6 +45,8 @@ class WorkoutService {
       },
     });
 
+    console.log(Wplan);
+
     if (Wplan) {
       (Wplan.workoutPlan as ExerciseType[]) = workoutPlan;
       await Wplan.save();
@@ -60,6 +62,7 @@ class WorkoutService {
 
   public GetWorkoutPlan = async (dateOfWorkout: Date, clientName: string) => {
     const normalizedDate = normalizeToUTCMinute(dateOfWorkout);
+    console.log(normalizedDate + " normalizedDate");
 
     const Wplan = await WorkoutModel.findOne({
       clientName,
@@ -200,8 +203,6 @@ class WorkoutService {
     clientName: string,
     dateOfWorkout: Date
   ) => {
-    console.log(clientName + " GetCurrentWorkoutPlan");
-
     const start = new Date(dateOfWorkout);
     start.setHours(0, 0, 0, 0);
 

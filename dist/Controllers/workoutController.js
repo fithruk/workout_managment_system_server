@@ -29,7 +29,8 @@ class WorkoutController {
         this.SaveWorkoutResult = async (req, res, next) => {
             try {
                 const { name, date, workoutResult, } = req.body;
-                const workoutResponce = await workoutService_1.default.SaveWorkoutResults(workoutResult, name, date);
+                console.log(date);
+                const workoutResponce = await workoutService_1.default.SaveWorkoutResults(workoutResult, name, new Date(date));
                 res.status(200).json({ workoutResponce });
             }
             catch (error) {
