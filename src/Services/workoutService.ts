@@ -45,8 +45,6 @@ class WorkoutService {
       },
     });
 
-    console.log(Wplan);
-
     if (Wplan) {
       (Wplan.workoutPlan as ExerciseType[]) = workoutPlan;
       await Wplan.save();
@@ -61,15 +59,24 @@ class WorkoutService {
   };
 
   public GetWorkoutPlan = async (dateOfWorkout: Date, clientName: string) => {
-    const normalizedDate = normalizeToUTCMinute(dateOfWorkout);
-    console.log(normalizedDate + " normalizedDate");
+    const start = new Date(dateOfWorkout);
+    start.setHours(0, 0, 0, 0);
+
+    const end = new Date(start);
+    end.setDate(end.getDate() + 1);
 
     const Wplan = await WorkoutModel.findOne({
       clientName,
-      dateOfWorkout: new Date(normalizedDate),
+      dateOfWorkout: {
+        $gte: start,
+        $lt: end,
+      },
     });
+
     if (!Wplan)
-      throw ApiError.BadRequest(`Плану тренування на ${dateOfWorkout} немає`);
+      throw ApiError.BadRequest(
+        `Плану тренування на ${start.toLocaleDateString()} немає`
+      );
 
     return Wplan;
   };
