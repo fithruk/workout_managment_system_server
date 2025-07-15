@@ -60,13 +60,13 @@ class DataBaseService {
             const allClients = await workoutsByPersoneModel_2.default.find().lean();
             return allClients
                 .filter((client) => {
-                const lastDateRaw = client.workoutDates[client.workoutDates.length - 1];
-                const lastDate = new Date(lastDateRaw);
-                return (0, dayjs_1.default)(lastDate).isSame((0, dayjs_1.default)(date), "day");
+                return client.workoutDates.some((day) => (0, dayjs_1.default)(day?.toString()).isSame((0, dayjs_1.default)(date), "day"));
             })
                 .map((client) => ({
                 clientName: client.name,
-                date: (0, dayjs_1.default)(new Date(client.workoutDates[client.workoutDates.length - 1])).toDate(),
+                date: (0, dayjs_1.default)(client.workoutDates
+                    .find((day) => (0, dayjs_1.default)(day?.toString()).isSame((0, dayjs_1.default)(date), "day"))
+                    ?.toString()).toDate(),
             }));
         };
     }

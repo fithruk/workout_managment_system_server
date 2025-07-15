@@ -37,6 +37,7 @@ class AdminService {
             return await workoutService_1.default.GetCurrentWorkoutPlan(name, date);
         };
         this.GetTodayClientsAbonements = async (todaysDate) => {
+            console.log(todaysDate + " todaysDate");
             const [todaysClients, allAbonements] = await Promise.all([
                 dataBaseService_1.default.GetClientsByDate(todaysDate),
                 dataBaseService_1.default.GetAllAbonements(),

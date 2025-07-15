@@ -37,11 +37,11 @@ class WorkoutService {
                     $lt: end,
                 },
             });
-            console.log(Wplan);
             if (Wplan) {
-                Wplan.workoutPlan = workoutPlan;
-                await Wplan.save();
-                return;
+                // (Wplan.workoutPlan as ExerciseType[]) = workoutPlan;
+                // await Wplan.save();
+                // return;
+                await Wplan.deleteOne();
             }
             await workoutModel_1.default.create({
                 dateOfWorkout: new Date(dateOfWorkout),
@@ -50,14 +50,19 @@ class WorkoutService {
             });
         };
         this.GetWorkoutPlan = async (dateOfWorkout, clientName) => {
-            const normalizedDate = (0, dataNormilize_1.normalizeToUTCMinute)(dateOfWorkout);
-            console.log(normalizedDate + " normalizedDate");
+            const start = new Date(dateOfWorkout);
+            start.setHours(0, 0, 0, 0);
+            const end = new Date(start);
+            end.setDate(end.getDate() + 1);
             const Wplan = await workoutModel_1.default.findOne({
                 clientName,
-                dateOfWorkout: new Date(normalizedDate),
+                dateOfWorkout: {
+                    $gte: start,
+                    $lt: end,
+                },
             });
             if (!Wplan)
-                throw apiExeption_1.default.BadRequest(`Плану тренування на ${dateOfWorkout} немає`);
+                throw apiExeption_1.default.BadRequest(`Плану тренування на ${start.toLocaleDateString()} немає`);
             return Wplan;
         };
         this.SaveWorkoutResults = async (workoutResult, name, date) => {
@@ -161,11 +166,29 @@ class WorkoutService {
         //     dateOfWorkout: new Date(normalizedDate),
         //   });
         // };
+        // public GetCurrentWorkoutPlan = async (
+        //   clientName: string,
+        //   dateOfWorkout: Date
+        // ) => {
+        //   console.log(dateOfWorkout + " dateOfWorkout");
+        //   const start = new Date(dateOfWorkout);
+        //   console.log(start +  " start");
+        //   start.setHours(0, 0, 0, 0);
+        //   const end = new Date(start);
+        //   end.setDate(end.getDate() + 1); // следующий день
+        //   return await WorkoutModel.findOne({
+        //     clientName,
+        //     dateOfWorkout: {
+        //       $gte: start,
+        //       $lt: end,
+        //     },
+        //   });
+        // };
         this.GetCurrentWorkoutPlan = async (clientName, dateOfWorkout) => {
-            const start = new Date(dateOfWorkout);
+            const start = (0, dataNormilize_1.normalizeToUTCMinute)(dateOfWorkout);
             start.setHours(0, 0, 0, 0);
-            const end = new Date(start);
-            end.setDate(end.getDate() + 1); // следующий день
+            const end = (0, dataNormilize_1.normalizeToUTCMinute)(start);
+            end.setDate(end.getDate() + 1);
             return await workoutModel_1.default.findOne({
                 clientName,
                 dateOfWorkout: {
