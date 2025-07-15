@@ -61,7 +61,6 @@ class AdminService {
       dataBaseService.GetClientsByDate(todaysDate),
       dataBaseService.GetAllAbonements(),
     ]);
-    console.log(todaysClients);
 
     const abonemetsForTable = allAbonements
       .map((ab) => {

@@ -46,9 +46,10 @@ class WorkoutService {
     });
 
     if (Wplan) {
-      (Wplan.workoutPlan as ExerciseType[]) = workoutPlan;
-      await Wplan.save();
-      return;
+      // (Wplan.workoutPlan as ExerciseType[]) = workoutPlan;
+      // await Wplan.save();
+      // return;
+      await Wplan.deleteOne();
     }
 
     await WorkoutModel.create({
