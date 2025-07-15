@@ -206,15 +206,39 @@ class WorkoutService {
   //   });
   // };
 
+  // public GetCurrentWorkoutPlan = async (
+  //   clientName: string,
+  //   dateOfWorkout: Date
+  // ) => {
+  //   console.log(dateOfWorkout + " dateOfWorkout");
+
+  //   const start = new Date(dateOfWorkout);
+  //   console.log(start +  " start");
+
+  //   start.setHours(0, 0, 0, 0);
+
+  //   const end = new Date(start);
+  //   end.setDate(end.getDate() + 1); // следующий день
+
+  //   return await WorkoutModel.findOne({
+  //     clientName,
+  //     dateOfWorkout: {
+  //       $gte: start,
+  //       $lt: end,
+  //     },
+  //   });
+  // };
+
   public GetCurrentWorkoutPlan = async (
     clientName: string,
     dateOfWorkout: Date
   ) => {
-    const start = new Date(dateOfWorkout);
+    const start = normalizeToUTCMinute(dateOfWorkout);
+
     start.setHours(0, 0, 0, 0);
 
-    const end = new Date(start);
-    end.setDate(end.getDate() + 1); // следующий день
+    const end = normalizeToUTCMinute(start);
+    end.setDate(end.getDate() + 1);
 
     return await WorkoutModel.findOne({
       clientName,

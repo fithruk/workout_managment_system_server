@@ -71,19 +71,18 @@ class DataBaseService {
 
     return allClients
       .filter((client) => {
-        const lastDateRaw = client.workoutDates[client.workoutDates.length - 1];
-        const lastDate = new Date(lastDateRaw as unknown as Date);
-
-        return dayjs(lastDate).isSame(dayjs(date), "day");
+        return client.workoutDates.some((day) =>
+          dayjs((day as any)?.toString()).isSame(dayjs(date), "day")
+        );
       })
       .map((client) => ({
         clientName: client.name,
         date: dayjs(
-          new Date(
-            client.workoutDates[
-              client.workoutDates.length - 1
-            ] as unknown as Date
-          )
+          client.workoutDates
+            .find((day) =>
+              dayjs((day as any)?.toString()).isSame(dayjs(date), "day")
+            )
+            ?.toString()
         ).toDate(),
       }));
   };
