@@ -7,6 +7,7 @@ const apiExeption_1 = __importDefault(require("../Exeptions/apiExeption"));
 const workoutModel_1 = __importDefault(require("../Models/workoutModel"));
 const workoutResultModel_1 = __importDefault(require("../Models/workoutResultModel"));
 const dataNormilize_1 = require("../Helpers/DataNormilize/dataNormilize");
+const dayjs_1 = __importDefault(require("dayjs"));
 class WorkoutService {
     constructor() {
         // public SaveWorkoutPlan = async (plan: WorkoutPlanType) => {
@@ -104,6 +105,12 @@ class WorkoutService {
             });
             return workoutResults;
         };
+        this.GetAllWorkoutResults = async (clientName) => {
+            const workoutResults = await workoutResultModel_1.default.find({
+                clientName,
+            });
+            return workoutResults;
+        };
         this.GetCombinedWorkoutDataByRange = async (dateOfRangeStart, dateOfRangeEnd, clientName) => {
             const combined = await workoutModel_1.default.aggregate([
                 {
@@ -111,13 +118,13 @@ class WorkoutService {
                         clientName,
                         dateOfWorkout: {
                             $gte: new Date(dateOfRangeStart),
-                            $lte: new Date(dateOfRangeEnd),
+                            $lt: (0, dayjs_1.default)(dateOfRangeEnd).add(1, "day").startOf("day").toDate(),
                         },
                     },
                 },
                 {
                     $lookup: {
-                        from: "workoutresults", // имя коллекции в MongoDB, не имя модели
+                        from: "workoutresults",
                         let: { date: "$dateOfWorkout", name: "$clientName" },
                         pipeline: [
                             {
@@ -125,7 +132,19 @@ class WorkoutService {
                                     $expr: {
                                         $and: [
                                             { $eq: ["$clientName", "$$name"] },
-                                            { $eq: ["$dateOfWorkout", "$$date"] },
+                                            {
+                                                $eq: [
+                                                    {
+                                                        $dateToString: {
+                                                            format: "%Y-%m-%d",
+                                                            date: "$dateOfWorkout",
+                                                        },
+                                                    },
+                                                    {
+                                                        $dateToString: { format: "%Y-%m-%d", date: "$$date" },
+                                                    },
+                                                ],
+                                            },
                                         ],
                                     },
                                 },

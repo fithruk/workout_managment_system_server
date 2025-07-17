@@ -7,6 +7,7 @@ import {
   WorkoutPlanType,
   SetsAndValuesResults,
 } from "../Types/types";
+import dayjs from "dayjs";
 
 class WorkoutService {
   // public SaveWorkoutPlan = async (plan: WorkoutPlanType) => {
@@ -138,6 +139,14 @@ class WorkoutService {
     return workoutResults;
   };
 
+  public GetAllWorkoutResults = async (clientName: string) => {
+    const workoutResults = await workoutResultModel.find({
+      clientName,
+    });
+
+    return workoutResults;
+  };
+
   public GetCombinedWorkoutDataByRange = async (
     dateOfRangeStart: Date,
     dateOfRangeEnd: Date,
@@ -149,13 +158,13 @@ class WorkoutService {
           clientName,
           dateOfWorkout: {
             $gte: new Date(dateOfRangeStart),
-            $lte: new Date(dateOfRangeEnd),
+            $lt: dayjs(dateOfRangeEnd).add(1, "day").startOf("day").toDate(),
           },
         },
       },
       {
         $lookup: {
-          from: "workoutresults", // имя коллекции в MongoDB, не имя модели
+          from: "workoutresults",
           let: { date: "$dateOfWorkout", name: "$clientName" },
           pipeline: [
             {
@@ -163,7 +172,19 @@ class WorkoutService {
                 $expr: {
                   $and: [
                     { $eq: ["$clientName", "$$name"] },
-                    { $eq: ["$dateOfWorkout", "$$date"] },
+                    {
+                      $eq: [
+                        {
+                          $dateToString: {
+                            format: "%Y-%m-%d",
+                            date: "$dateOfWorkout",
+                          },
+                        },
+                        {
+                          $dateToString: { format: "%Y-%m-%d", date: "$$date" },
+                        },
+                      ],
+                    },
                   ],
                 },
               },

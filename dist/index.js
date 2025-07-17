@@ -10,6 +10,7 @@ const dataBaseRoute_1 = __importDefault(require("./Routs/dataBaseRoute"));
 const adminRoute_1 = __importDefault(require("./Routs/adminRoute"));
 const exerciseRoute_1 = __importDefault(require("./Routs/exerciseRoute"));
 const workoutsRoute_1 = __importDefault(require("./Routs/workoutsRoute"));
+const statRoute_1 = __importDefault(require("./Routs/statRoute"));
 const mongoose_1 = __importDefault(require("mongoose"));
 const cors_1 = __importDefault(require("cors"));
 const errorMiddleware_1 = __importDefault(require("./Middlewares/errorMiddleware"));
@@ -26,6 +27,7 @@ app.use("/dataBase", dataBaseRoute_1.default);
 app.use("/admin", adminRoute_1.default);
 app.use("/exercises", exerciseRoute_1.default);
 app.use("/workouts", workoutsRoute_1.default);
+app.use("/statistics", statRoute_1.default);
 app.use(errorMiddleware_1.default);
 // setupAbonementCron();
 const start = async () => {

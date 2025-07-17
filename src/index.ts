@@ -5,6 +5,7 @@ import DataBaseRouter from "./Routs/dataBaseRoute";
 import AdminRouter from "./Routs/adminRoute";
 import ExerciseRouter from "./Routs/exerciseRoute";
 import WorkoutRouter from "./Routs/workoutsRoute";
+import StatisticsRouter from "./Routs/statRoute";
 import mongoose from "mongoose";
 import cors from "cors";
 import errorMiddlaware from "./Middlewares/errorMiddleware";
@@ -26,6 +27,7 @@ app.use("/dataBase", DataBaseRouter);
 app.use("/admin", AdminRouter);
 app.use("/exercises", ExerciseRouter);
 app.use("/workouts", WorkoutRouter);
+app.use("/statistics", StatisticsRouter);
 app.use(errorMiddlaware);
 
 // setupAbonementCron();
