@@ -86,10 +86,17 @@ class WorkoutService {
             return currentWorkout;
         };
         this.GetWorkoutResults = async (clientName, dateOfWorkout) => {
-            const normalizedDate = (0, dataNormilize_1.normalizeToUTCMinute)(dateOfWorkout);
+            // const normalizedDate = normalizeToUTCMinute(dateOfWorkout);
+            const start = (0, dataNormilize_1.normalizeToUTCMinute)(dateOfWorkout);
+            start.setHours(0, 0, 0, 0);
+            const end = (0, dataNormilize_1.normalizeToUTCMinute)(start);
+            end.setDate(end.getDate() + 1);
             const currentWorkout = await workoutResultModel_1.default.findOne({
                 clientName,
-                dateOfWorkout: new Date(normalizedDate),
+                dateOfWorkout: {
+                    $gte: new Date(start),
+                    $lte: new Date(end),
+                },
             });
             if (!currentWorkout)
                 return null;

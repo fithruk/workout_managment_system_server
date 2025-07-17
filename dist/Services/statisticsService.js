@@ -25,6 +25,11 @@ class StatisticsService {
                 "Incline Dumbbell Bench Press",
                 "Barbell Incline Bench Press",
                 "Barbell Bicep Curl",
+                "Barbell Row",
+                "Overhead Press",
+                "Front Squat",
+                "Romanian Deadlift",
+                "Weighted Pull Up",
             ];
             const totalVolumeProgression = [];
             allWorkouts.forEach((workout) => {

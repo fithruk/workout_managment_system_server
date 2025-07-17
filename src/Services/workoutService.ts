@@ -113,11 +113,20 @@ class WorkoutService {
     clientName: string,
     dateOfWorkout: Date
   ) => {
-    const normalizedDate = normalizeToUTCMinute(dateOfWorkout);
+    // const normalizedDate = normalizeToUTCMinute(dateOfWorkout);
+    const start = normalizeToUTCMinute(dateOfWorkout);
+
+    start.setHours(0, 0, 0, 0);
+
+    const end = normalizeToUTCMinute(start);
+    end.setDate(end.getDate() + 1);
 
     const currentWorkout = await workoutResultModel.findOne({
       clientName,
-      dateOfWorkout: new Date(normalizedDate),
+      dateOfWorkout: {
+        $gte: new Date(start),
+        $lte: new Date(end),
+      },
     });
     if (!currentWorkout) return null;
     return currentWorkout;
