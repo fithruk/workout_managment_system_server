@@ -19,6 +19,8 @@ class WorkoutController {
         this.GetWorkoutPlan = async (req, res, next) => {
             try {
                 const { dateOfWorkout, clientName, } = req.body;
+                console.log(clientName);
+                console.log(dateOfWorkout);
                 const workoutPlan = await workoutService_1.default.GetWorkoutPlan(dateOfWorkout, clientName);
                 res.status(200).json({ workoutPlan });
             }
