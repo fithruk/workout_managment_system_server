@@ -40,3 +40,34 @@ export type OneSet = Partial<{
 export type SetsAndValuesResults = {
   [exerciseName: string]: OneSet[];
 };
+
+type WorkoutResultType = Map<string, OneSet[]>;
+
+export type WorkoutData = {
+  clientName: string;
+  dateOfWorkout: Date;
+  workoutResult: WorkoutResultType;
+};
+
+interface ExerciseStepDescription {
+  PhaseKey: number;
+  PhaseName: "prepearing" | "processing" | "technicalTips";
+  Instructions: string[];
+}
+
+interface ExerciseStep {
+  StepNameEng: string;
+  StepNameRu: string;
+  StepNameUa: string;
+  DescriptionsRu: ExerciseStepDescription[];
+  DescriptionsUa: ExerciseStepDescription[];
+}
+
+export interface Exercise {
+  ExerciseName: string;
+  ExerciseMuscleGroup: string;
+  Equipment: string;
+  Difficulty: "easy" | "medium" | "hard";
+  ImageUrl: string;
+  Steps: ExerciseStep[];
+}
