@@ -27,8 +27,6 @@ class WorkoutController {
         dateOfWorkout,
         clientName,
       }: { dateOfWorkout: Date; clientName: string } = req.body;
-      console.log(clientName);
-      console.log(dateOfWorkout);
 
       const workoutPlan = await workoutService.GetWorkoutPlan(
         dateOfWorkout,
@@ -52,8 +50,6 @@ class WorkoutController {
         workoutResult,
       }: { name: string; date: Date; workoutResult: SetsAndValuesResults } =
         req.body;
-
-      console.log(date);
 
       const workoutResponce = await workoutService.SaveWorkoutResults(
         workoutResult,

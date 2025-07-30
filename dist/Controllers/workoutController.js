@@ -19,8 +19,6 @@ class WorkoutController {
         this.GetWorkoutPlan = async (req, res, next) => {
             try {
                 const { dateOfWorkout, clientName, } = req.body;
-                console.log(clientName);
-                console.log(dateOfWorkout);
                 const workoutPlan = await workoutService_1.default.GetWorkoutPlan(dateOfWorkout, clientName);
                 res.status(200).json({ workoutPlan });
             }
@@ -31,7 +29,6 @@ class WorkoutController {
         this.SaveWorkoutResult = async (req, res, next) => {
             try {
                 const { name, date, workoutResult, } = req.body;
-                console.log(date);
                 const workoutResponce = await workoutService_1.default.SaveWorkoutResults(workoutResult, name, new Date(date));
                 res.status(200).json({ workoutResponce });
             }

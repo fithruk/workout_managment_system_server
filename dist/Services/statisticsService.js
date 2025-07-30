@@ -155,6 +155,10 @@ class StatisticsService {
             });
             return tonnageByWorkout;
         };
+        this.GetWeightChangeDynamicsDataByName = async (clientName, exerciseName) => {
+            const workoutData = await workoutService_1.default.GetWeightChangeDynamicsDataByName(clientName, exerciseName);
+            return workoutData;
+        };
     }
 }
 exports.default = new StatisticsService();

@@ -223,6 +223,27 @@ class WorkoutService {
                 },
             });
         };
+        this.GetWeightChangeDynamicsDataByName = async (clientName, exerciseName) => {
+            const exerciseData = await workoutResultModel_1.default.aggregate([
+                {
+                    $match: {
+                        clientName,
+                        [`workoutResult.${exerciseName}`]: { $exists: true },
+                    },
+                },
+                {
+                    $project: {
+                        _id: 0,
+                        date: "$dateOfWorkout",
+                        sets: `$workoutResult.${exerciseName}`,
+                    },
+                },
+                {
+                    $sort: { date: 1 }, // по дате по возрастанию
+                },
+            ]);
+            return exerciseData;
+        };
     }
 }
 exports.default = new WorkoutService();

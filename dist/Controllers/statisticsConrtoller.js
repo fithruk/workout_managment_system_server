@@ -16,6 +16,16 @@ class StatisticsController {
                 next(error);
             }
         };
+        this.GetWeightChangeDynamicsDataByName = async (req, res, next) => {
+            try {
+                const { clientName, exerciseName } = req.params;
+                const statData = await statisticsService_1.default.GetWeightChangeDynamicsDataByName(clientName, exerciseName);
+                res.status(200).json(statData);
+            }
+            catch (error) {
+                next(error);
+            }
+        };
     }
 }
 exports.default = new StatisticsController();

@@ -13,4 +13,5 @@ const router = (0, express_1.Router)();
 //   workoutController.SaveWorkoutPlan
 // );
 router.get("/getStatisticsByName/:clientName", authMiddleware_1.authMiddlaware, statisticsConrtoller_1.default.GetCommonSatisticsByName);
+router.get("/GetWeightChangeDynamicsDataByName/:clientName/:exerciseName", authMiddleware_1.authMiddlaware, statisticsConrtoller_1.default.GetWeightChangeDynamicsDataByName);
 exports.default = router;

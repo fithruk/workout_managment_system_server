@@ -17,4 +17,9 @@ router.get(
   statisticsConrtoller.GetCommonSatisticsByName
 );
 
+router.get(
+  "/GetWeightChangeDynamicsDataByName/:clientName/:exerciseName",
+  authMiddlaware,
+  statisticsConrtoller.GetWeightChangeDynamicsDataByName
+);
 export default router;

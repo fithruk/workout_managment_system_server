@@ -29,7 +29,6 @@ app.use("/exercises", exerciseRoute_1.default);
 app.use("/workouts", workoutsRoute_1.default);
 app.use("/statistics", statRoute_1.default);
 app.use(errorMiddleware_1.default);
-// setupAbonementCron();
 const start = async () => {
     try {
         await mongoose_1.default.connect(process.env.MONGO_DB_URL);

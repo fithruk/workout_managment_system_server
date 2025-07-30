@@ -226,6 +226,18 @@ class StatisticsService {
 
     return tonnageByWorkout;
   };
+
+  public GetWeightChangeDynamicsDataByName = async (
+    clientName: string,
+    exerciseName: string
+  ) => {
+    const workoutData = await workoutService.GetWeightChangeDynamicsDataByName(
+      clientName,
+      exerciseName
+    );
+
+    return workoutData;
+  };
 }
 
 export default new StatisticsService();

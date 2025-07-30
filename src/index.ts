@@ -30,8 +30,6 @@ app.use("/workouts", WorkoutRouter);
 app.use("/statistics", StatisticsRouter);
 app.use(errorMiddlaware);
 
-// setupAbonementCron();
-
 const start = async () => {
   try {
     await mongoose.connect(process.env.MONGO_DB_URL!);
