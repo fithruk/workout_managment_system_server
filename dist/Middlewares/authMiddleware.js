@@ -9,12 +9,11 @@ const apiExeption_1 = __importDefault(require("../Exeptions/apiExeption"));
 const authMiddlaware = (req, res, next) => {
     try {
         const authorizationHeader = req.headers.authorization;
+        console.log(authorizationHeader + " authorizationHeader");
         if (!authorizationHeader) {
             return next(apiExeption_1.default.UnauthorizedError());
         }
         const accessToken = authorizationHeader.split(" ")[1];
-        console.log(req.headers["user-agent"]);
-        console.log(accessToken + " accessToken");
         if (!accessToken) {
             return next(apiExeption_1.default.UnauthorizedError());
         }
