@@ -11,11 +11,16 @@ const authMiddlaware = (req: Request, res: Response, next: NextFunction) => {
     }
 
     const accessToken = authorizationHeader.split(" ")[1];
+    console.log(req.headers["user-agent"]);
+    console.log(accessToken + " accessToken");
+
     if (!accessToken) {
       return next(ApiError.UnauthorizedError());
     }
 
     const userData = tokenService.ValidateToken(accessToken);
+    console.log(userData);
+
     if (!userData) {
       return next(ApiError.UnauthorizedError());
     }

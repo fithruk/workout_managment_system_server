@@ -13,10 +13,13 @@ const authMiddlaware = (req, res, next) => {
             return next(apiExeption_1.default.UnauthorizedError());
         }
         const accessToken = authorizationHeader.split(" ")[1];
+        console.log(req.headers["user-agent"]);
+        console.log(accessToken + " accessToken");
         if (!accessToken) {
             return next(apiExeption_1.default.UnauthorizedError());
         }
         const userData = tokenService_1.default.ValidateToken(accessToken);
+        console.log(userData);
         if (!userData) {
             return next(apiExeption_1.default.UnauthorizedError());
         }
