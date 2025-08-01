@@ -13,6 +13,9 @@ class AdminService {
         this.GetAllClients = async () => {
             return await userService_1.default.GetAllClients();
         };
+        this.GetAllTimeClients = async () => {
+            return await dataBaseService_1.default.GetAllTimeClients();
+        };
         this.GetClientWorkouts = async (name) => {
             return await dataBaseService_1.default.GetWorkoutesDatesByName(name);
         };

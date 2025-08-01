@@ -82,6 +82,15 @@ class AdminController {
                 next(error);
             }
         };
+        this.GetAllTimeClients = async (req, res, next) => {
+            try {
+                const allTimeClients = await adminService_1.default.GetAllTimeClients();
+                res.status(200).json(allTimeClients ?? []);
+            }
+            catch (error) {
+                next(error);
+            }
+        };
     }
 }
 exports.default = new AdminController();

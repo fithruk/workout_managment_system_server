@@ -10,6 +10,12 @@ route.get(
   adminController.GetCurrentWorkoutPlan
 );
 
+route.get(
+  "/getAllTimeClients",
+  adminMiddlaware,
+  adminController.GetAllTimeClients
+);
+
 route.put("/updateAbonements", adminController.UpdateAbonements);
 
 route.post(

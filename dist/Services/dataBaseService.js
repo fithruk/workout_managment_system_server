@@ -19,6 +19,9 @@ class DataBaseService {
             }));
             await workoutsByPersoneModel_1.default.insertMany(newData);
         };
+        this.GetAllTimeClients = async () => {
+            return await workoutsByPersoneModel_1.default.find();
+        };
         this.GetWorkoutesDatesByName = async (name) => {
             const sortedName = name
                 .split(" ")

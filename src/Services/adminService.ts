@@ -9,6 +9,10 @@ class AdminService {
     return await userService.GetAllClients();
   };
 
+  public GetAllTimeClients = async () => {
+    return await dataBaseService.GetAllTimeClients();
+  };
+
   public GetClientWorkouts = async (name: string) => {
     return await dataBaseService.GetWorkoutesDatesByName(name);
   };

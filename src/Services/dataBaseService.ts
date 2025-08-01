@@ -17,6 +17,10 @@ class DataBaseService {
     await WorkoutsByPersoneModel.insertMany(newData);
   };
 
+  public GetAllTimeClients = async () => {
+    return await WorkoutsByPersoneModel.find();
+  };
+
   public GetWorkoutesDatesByName = async (name: string) => {
     const sortedName = name
       .split(" ")
