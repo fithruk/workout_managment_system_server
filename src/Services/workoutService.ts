@@ -10,25 +10,6 @@ import {
 import dayjs from "dayjs";
 
 class WorkoutService {
-  // public SaveWorkoutPlan = async (plan: WorkoutPlanType) => {
-  //   const { clientName, dateOfWorkout, workoutPlan } = plan;
-
-  //   const normalizedDate = normalizeToUTCMinute(plan.dateOfWorkout);
-
-  //   const Wplan = await WorkoutModel.findOne({ clientName, dateOfWorkout });
-  //   if (Wplan) {
-  //     (Wplan.workoutPlan as ExerciseType[]) = workoutPlan;
-  //     await Wplan.save();
-  //     return;
-  //   }
-
-  //   await WorkoutModel.create({
-  //     dateOfWorkout: new Date(normalizedDate),
-  //     clientName,
-  //     workoutPlan,
-  //   });
-  // };
-
   public SaveWorkoutPlan = async (plan: WorkoutPlanType) => {
     const { clientName, dateOfWorkout, workoutPlan } = plan;
 
@@ -60,6 +41,28 @@ class WorkoutService {
     });
   };
 
+  public GetAllWorkoutPlansForToday = async () => {
+    const start = new Date();
+    start.setHours(0, 0, 0, 0);
+
+    const end = new Date(start);
+    end.setDate(end.getDate() + 1);
+
+    const Wplans = await WorkoutModel.find({
+      dateOfWorkout: {
+        $gte: start,
+        $lt: end,
+      },
+    });
+
+    if (!Wplans)
+      throw ApiError.BadRequest(
+        `Планов тренуваннь на ${start.toLocaleDateString()} немає`
+      );
+
+    return Wplans;
+  };
+
   public GetWorkoutPlan = async (dateOfWorkout: Date, clientName: string) => {
     const start = new Date(dateOfWorkout);
     start.setHours(0, 0, 0, 0);
@@ -83,26 +86,57 @@ class WorkoutService {
     return Wplan;
   };
 
+  // public SaveWorkoutResults = async (
+  //   workoutResult: SetsAndValuesResults,
+  //   name: string,
+  //   date: Date
+  // ) => {
+  //   const normalizedDate = normalizeToUTCMinute(date);
+
+  //   const currentWorkout = await workoutResultModel.findOne({
+  //     clientName: name,
+  //     dateOfWorkout: new Date(normalizedDate),
+  //   });
+
+  //   if (!currentWorkout) {
+  //     const workout = await workoutResultModel.create({
+  //       clientName: name,
+  //       dateOfWorkout: new Date(normalizedDate),
+  //       workoutResult: workoutResult,
+  //     });
+  //     return workout;
+  //   }
+  //   (currentWorkout.workoutResult as unknown as SetsAndValuesResults) =
+  //     workoutResult;
+  //   await currentWorkout.save();
+  //   return currentWorkout;
+  // };
+
   public SaveWorkoutResults = async (
     workoutResult: SetsAndValuesResults,
     name: string,
     date: Date
   ) => {
-    const normalizedDate = normalizeToUTCMinute(date);
+    // Обнуляем время, чтобы осталась только дата
+    const onlyDateUTC = new Date(
+      Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate())
+    );
 
     const currentWorkout = await workoutResultModel.findOne({
       clientName: name,
-      dateOfWorkout: new Date(normalizedDate),
+      dateOfWorkout: onlyDateUTC,
     });
 
     if (!currentWorkout) {
       const workout = await workoutResultModel.create({
         clientName: name,
-        dateOfWorkout: new Date(normalizedDate),
+        dateOfWorkout: onlyDateUTC,
         workoutResult: workoutResult,
       });
       return workout;
     }
+
+    // обновляем результат
     (currentWorkout.workoutResult as unknown as SetsAndValuesResults) =
       workoutResult;
     await currentWorkout.save();

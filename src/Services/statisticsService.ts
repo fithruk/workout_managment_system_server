@@ -136,7 +136,15 @@ class StatisticsService {
     allWorkouts: WorkoutData[],
     allExercises: Exercise[]
   ) => {
-    const groups: Record<string, number> = {};
+    if (!allWorkouts.length) return;
+    const groups: Record<string, number> = {
+      arm: 0,
+      back: 0,
+      chest: 0,
+      leg: 0,
+      abs: 0,
+      shoulder: 0,
+    };
     let allSets = 0;
 
     const exerciseMap = new Map(

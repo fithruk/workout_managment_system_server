@@ -137,6 +137,10 @@ class AdminService {
 
     return allAbonements;
   };
+
+  public GetAllWorkoutPlansForToday = async () => {
+    return await workoutService.GetAllWorkoutPlansForToday();
+  };
 }
 
 export default new AdminService();

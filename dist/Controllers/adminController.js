@@ -91,6 +91,15 @@ class AdminController {
                 next(error);
             }
         };
+        this.GetAllWorkoutPlansForToday = async (req, res, next) => {
+            try {
+                const allWorkoutPlansForToday = await adminService_1.default.GetAllWorkoutPlansForToday();
+                res.status(200).json(allWorkoutPlansForToday ?? []);
+            }
+            catch (error) {
+                next(error);
+            }
+        };
     }
 }
 exports.default = new AdminController();

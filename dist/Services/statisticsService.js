@@ -93,7 +93,16 @@ class StatisticsService {
             return strengthProgression.sort((a, b) => a.date.getTime() - b.date.getTime());
         };
         this.GetFrequentMuscleGroups = (allWorkouts, allExercises) => {
-            const groups = {};
+            if (!allWorkouts.length)
+                return;
+            const groups = {
+                arm: 0,
+                back: 0,
+                chest: 0,
+                leg: 0,
+                abs: 0,
+                shoulder: 0,
+            };
             let allSets = 0;
             const exerciseMap = new Map(allExercises.map((ex) => [ex.ExerciseName, ex.ExerciseMuscleGroup]));
             allWorkouts.forEach((wk) => {

@@ -22,8 +22,9 @@
     "mongoose": "^8.15.1",
     "node-cron": "^4.1.0",
     "nodemon": "^3.1.10",
-    "typescript": "^5.8.3",
-    "ts-node": "^10.9.2"
+    "socket.io": "^4.8.1",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.8.3"
   },
   "devDependencies": {
     "@types/cors": "^2.8.18",

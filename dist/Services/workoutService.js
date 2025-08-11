@@ -10,21 +10,6 @@ const dataNormilize_1 = require("../Helpers/DataNormilize/dataNormilize");
 const dayjs_1 = __importDefault(require("dayjs"));
 class WorkoutService {
     constructor() {
-        // public SaveWorkoutPlan = async (plan: WorkoutPlanType) => {
-        //   const { clientName, dateOfWorkout, workoutPlan } = plan;
-        //   const normalizedDate = normalizeToUTCMinute(plan.dateOfWorkout);
-        //   const Wplan = await WorkoutModel.findOne({ clientName, dateOfWorkout });
-        //   if (Wplan) {
-        //     (Wplan.workoutPlan as ExerciseType[]) = workoutPlan;
-        //     await Wplan.save();
-        //     return;
-        //   }
-        //   await WorkoutModel.create({
-        //     dateOfWorkout: new Date(normalizedDate),
-        //     clientName,
-        //     workoutPlan,
-        //   });
-        // };
         this.SaveWorkoutPlan = async (plan) => {
             const { clientName, dateOfWorkout, workoutPlan } = plan;
             const start = new Date(dateOfWorkout);
@@ -50,6 +35,21 @@ class WorkoutService {
                 workoutPlan,
             });
         };
+        this.GetAllWorkoutPlansForToday = async () => {
+            const start = new Date();
+            start.setHours(0, 0, 0, 0);
+            const end = new Date(start);
+            end.setDate(end.getDate() + 1);
+            const Wplans = await workoutModel_1.default.find({
+                dateOfWorkout: {
+                    $gte: start,
+                    $lt: end,
+                },
+            });
+            if (!Wplans)
+                throw apiExeption_1.default.BadRequest(`Планов тренуваннь на ${start.toLocaleDateString()} немає`);
+            return Wplans;
+        };
         this.GetWorkoutPlan = async (dateOfWorkout, clientName) => {
             const start = new Date(dateOfWorkout);
             start.setHours(0, 0, 0, 0);
@@ -66,20 +66,45 @@ class WorkoutService {
                 throw apiExeption_1.default.BadRequest(`Плану тренування на ${start.toLocaleDateString()} немає`);
             return Wplan;
         };
+        // public SaveWorkoutResults = async (
+        //   workoutResult: SetsAndValuesResults,
+        //   name: string,
+        //   date: Date
+        // ) => {
+        //   const normalizedDate = normalizeToUTCMinute(date);
+        //   const currentWorkout = await workoutResultModel.findOne({
+        //     clientName: name,
+        //     dateOfWorkout: new Date(normalizedDate),
+        //   });
+        //   if (!currentWorkout) {
+        //     const workout = await workoutResultModel.create({
+        //       clientName: name,
+        //       dateOfWorkout: new Date(normalizedDate),
+        //       workoutResult: workoutResult,
+        //     });
+        //     return workout;
+        //   }
+        //   (currentWorkout.workoutResult as unknown as SetsAndValuesResults) =
+        //     workoutResult;
+        //   await currentWorkout.save();
+        //   return currentWorkout;
+        // };
         this.SaveWorkoutResults = async (workoutResult, name, date) => {
-            const normalizedDate = (0, dataNormilize_1.normalizeToUTCMinute)(date);
+            // Обнуляем время, чтобы осталась только дата
+            const onlyDateUTC = new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate()));
             const currentWorkout = await workoutResultModel_1.default.findOne({
                 clientName: name,
-                dateOfWorkout: new Date(normalizedDate),
+                dateOfWorkout: onlyDateUTC,
             });
             if (!currentWorkout) {
                 const workout = await workoutResultModel_1.default.create({
                     clientName: name,
-                    dateOfWorkout: new Date(normalizedDate),
+                    dateOfWorkout: onlyDateUTC,
                     workoutResult: workoutResult,
                 });
                 return workout;
             }
+            // обновляем результат
             currentWorkout.workoutResult =
                 workoutResult;
             await currentWorkout.save();

@@ -71,3 +71,19 @@ export interface Exercise {
   ImageUrl: string;
   Steps: ExerciseStep[];
 }
+
+export type SocketMessageType = { name: string; msg: string };
+
+export enum SocketEventsEnum {
+  getClientWhoAreTrainingNow = "getClientWhoAreTrainingNow",
+  clientDisconnected = "clientDisconnected",
+  newClientConnected = "newClientConnected",
+  updateWorkout = "updateWorkout",
+  sendUpdatedWorkoutToAdmin = "sendUpdatedWorkoutToAdmin",
+}
+
+export type SoketUpdateWorkoutType = {
+  name: string;
+  date: string;
+  workoutResult: SetsAndValuesResults;
+};
