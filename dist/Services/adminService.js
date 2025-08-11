@@ -92,6 +92,9 @@ class AdminService {
             }
             return allAbonements;
         };
+        this.GetAllWorkoutPlansForToday = async () => {
+            return await workoutService_1.default.GetAllWorkoutPlansForToday();
+        };
     }
 }
 exports.default = new AdminService();

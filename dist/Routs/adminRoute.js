@@ -10,6 +10,7 @@ const route = (0, express_1.Router)();
 route.get("/getAllClients", adminMiddleware_1.adminMiddlaware, adminController_1.default.GetAllClients);
 route.get("/getCurrentWorkoutPlan/:name/:date", adminMiddleware_1.adminMiddlaware, adminController_1.default.GetCurrentWorkoutPlan);
 route.get("/getAllTimeClients", adminMiddleware_1.adminMiddlaware, adminController_1.default.GetAllTimeClients);
+route.get("/getAllWorkoutPlansForToday", adminMiddleware_1.adminMiddlaware, adminController_1.default.GetAllWorkoutPlansForToday);
 route.put("/updateAbonements", adminController_1.default.UpdateAbonements);
 route.post("/getTodayClientsAbonements", adminMiddleware_1.adminMiddlaware, adminController_1.default.GetTodayClientsAbonements);
 route.post("/getClientWorkouts", adminMiddleware_1.adminMiddlaware, adminController_1.default.GetClientWorkouts);

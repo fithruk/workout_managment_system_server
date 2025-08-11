@@ -9,7 +9,7 @@ const apiExeption_1 = __importDefault(require("../Exeptions/apiExeption"));
 const authMiddlaware = (req, res, next) => {
     try {
         const authorizationHeader = req.headers.authorization;
-        console.log(authorizationHeader + " authorizationHeader");
+        // console.log(authorizationHeader + " authorizationHeader");
         if (!authorizationHeader) {
             return next(apiExeption_1.default.UnauthorizedError());
         }
@@ -18,7 +18,7 @@ const authMiddlaware = (req, res, next) => {
             return next(apiExeption_1.default.UnauthorizedError());
         }
         const userData = tokenService_1.default.ValidateToken(accessToken);
-        console.log(userData);
+        // console.log(userData);
         if (!userData) {
             return next(apiExeption_1.default.UnauthorizedError());
         }
