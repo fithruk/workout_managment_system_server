@@ -57,9 +57,6 @@ io.on("connection", (socket) => {
         console.log("Socket disconnected:", socket.id);
         socketService.notifyAdmins();
     });
-    socket.on(types_1.SocketEventsEnum.getClientWhoAreTrainingNow, () => {
-        socketService.notifyAdmins();
-    });
     socket.on(types_1.SocketEventsEnum.newClientConnected, (data) => {
         socketService.NewClientConnected(data);
     });

@@ -169,6 +169,20 @@ class AdminController {
       next(error);
     }
   };
+
+  public GetClientsWhoAreTrainingNow = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
+    try {
+      const clients = await adminService.GetClientsWhoAreTrainingNow();
+
+      res.status(200).json(clients ?? []);
+    } catch (error) {
+      next(error);
+    }
+  };
 }
 
 export default new AdminController();

@@ -207,34 +207,6 @@ class WorkoutService {
             ]);
             return combined;
         };
-        // public GetCurrentWorkoutPlan = async (
-        //   clientName: string,
-        //   dateOfWorkout: Date
-        // ) => {
-        //   const normalizedDate = normalizeToUTCMinute(dateOfWorkout);
-        //   return await WorkoutModel.findOne({
-        //     clientName,
-        //     dateOfWorkout: new Date(normalizedDate),
-        //   });
-        // };
-        // public GetCurrentWorkoutPlan = async (
-        //   clientName: string,
-        //   dateOfWorkout: Date
-        // ) => {
-        //   console.log(dateOfWorkout + " dateOfWorkout");
-        //   const start = new Date(dateOfWorkout);
-        //   console.log(start +  " start");
-        //   start.setHours(0, 0, 0, 0);
-        //   const end = new Date(start);
-        //   end.setDate(end.getDate() + 1); // следующий день
-        //   return await WorkoutModel.findOne({
-        //     clientName,
-        //     dateOfWorkout: {
-        //       $gte: start,
-        //       $lt: end,
-        //     },
-        //   });
-        // };
         this.GetCurrentWorkoutPlan = async (clientName, dateOfWorkout) => {
             const start = (0, dataNormilize_1.normalizeToUTCMinute)(dateOfWorkout);
             start.setHours(0, 0, 0, 0);
@@ -268,6 +240,18 @@ class WorkoutService {
                 },
             ]);
             return exerciseData;
+        };
+        this.GetClientsWhoAreTrainingNow = async () => {
+            const start = (0, dataNormilize_1.normalizeToUTCMinute)(new Date());
+            start.setHours(0, 0, 0, 0);
+            const end = (0, dataNormilize_1.normalizeToUTCMinute)(start);
+            end.setDate(end.getDate() + 1);
+            return await workoutResultModel_1.default.find({
+                dateOfWorkout: {
+                    $gte: start,
+                    $lt: end,
+                },
+            });
         };
     }
 }
