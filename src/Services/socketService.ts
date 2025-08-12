@@ -90,14 +90,6 @@ class SocketService {
     this.notifyAdmins();
   };
 
-  public GetClientWhoAreTrainingNow = () => {
-    this.socket.on(SocketEventsEnum.getClientWhoAreTrainingNow, () => {
-      const allRooms = [...this.socket.rooms];
-
-      this.EmitEvent(SocketEventsEnum.getClientWhoAreTrainingNow, allRooms);
-    });
-  };
-
   public UpdateWorkout = async (workoutData: SoketUpdateWorkoutType) => {
     const workout = await workoutService.SaveWorkoutResults(
       workoutData.workoutResult,

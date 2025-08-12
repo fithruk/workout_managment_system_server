@@ -59,8 +59,6 @@ class AdminService {
   };
 
   public GetTodayClientsAbonements = async (todaysDate: Date) => {
-    console.log(todaysDate + " todaysDate");
-
     const [todaysClients, allAbonements] = await Promise.all([
       dataBaseService.GetClientsByDate(todaysDate),
       dataBaseService.GetAllAbonements(),
@@ -140,6 +138,10 @@ class AdminService {
 
   public GetAllWorkoutPlansForToday = async () => {
     return await workoutService.GetAllWorkoutPlansForToday();
+  };
+
+  public GetClientsWhoAreTrainingNow = async () => {
+    return await workoutService.GetClientsWhoAreTrainingNow();
   };
 }
 

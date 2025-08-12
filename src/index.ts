@@ -64,10 +64,6 @@ io.on("connection", (socket) => {
     socketService.notifyAdmins();
   });
 
-  socket.on(SocketEventsEnum.getClientWhoAreTrainingNow, () => {
-    socketService.notifyAdmins();
-  });
-
   socket.on(SocketEventsEnum.newClientConnected, (data) => {
     socketService.NewClientConnected(data);
   });

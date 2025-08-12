@@ -63,12 +63,6 @@ class SocketService {
                 this.socket.join(roomName);
             this.notifyAdmins();
         };
-        this.GetClientWhoAreTrainingNow = () => {
-            this.socket.on(types_1.SocketEventsEnum.getClientWhoAreTrainingNow, () => {
-                const allRooms = [...this.socket.rooms];
-                this.EmitEvent(types_1.SocketEventsEnum.getClientWhoAreTrainingNow, allRooms);
-            });
-        };
         this.UpdateWorkout = async (workoutData) => {
             const workout = await workoutService_1.default.SaveWorkoutResults(workoutData.workoutResult, workoutData.name, new Date(workoutData.date));
             return workout.toObject();

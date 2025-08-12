@@ -260,40 +260,6 @@ class WorkoutService {
     return combined;
   };
 
-  // public GetCurrentWorkoutPlan = async (
-  //   clientName: string,
-  //   dateOfWorkout: Date
-  // ) => {
-  //   const normalizedDate = normalizeToUTCMinute(dateOfWorkout);
-  //   return await WorkoutModel.findOne({
-  //     clientName,
-  //     dateOfWorkout: new Date(normalizedDate),
-  //   });
-  // };
-
-  // public GetCurrentWorkoutPlan = async (
-  //   clientName: string,
-  //   dateOfWorkout: Date
-  // ) => {
-  //   console.log(dateOfWorkout + " dateOfWorkout");
-
-  //   const start = new Date(dateOfWorkout);
-  //   console.log(start +  " start");
-
-  //   start.setHours(0, 0, 0, 0);
-
-  //   const end = new Date(start);
-  //   end.setDate(end.getDate() + 1); // следующий день
-
-  //   return await WorkoutModel.findOne({
-  //     clientName,
-  //     dateOfWorkout: {
-  //       $gte: start,
-  //       $lt: end,
-  //     },
-  //   });
-  // };
-
   public GetCurrentWorkoutPlan = async (
     clientName: string,
     dateOfWorkout: Date
@@ -337,6 +303,21 @@ class WorkoutService {
       },
     ]);
     return exerciseData;
+  };
+
+  public GetClientsWhoAreTrainingNow = async () => {
+    const start = normalizeToUTCMinute(new Date());
+
+    start.setHours(0, 0, 0, 0);
+    const end = normalizeToUTCMinute(start);
+
+    end.setDate(end.getDate() + 1);
+    return await workoutResultModel.find({
+      dateOfWorkout: {
+        $gte: start,
+        $lt: end,
+      },
+    });
   };
 }
 

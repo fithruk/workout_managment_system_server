@@ -22,6 +22,12 @@ route.get(
   adminController.GetAllWorkoutPlansForToday
 );
 
+route.get(
+  "/getClientsWhoAreTrainingNow",
+  adminMiddlaware,
+  adminController.GetClientsWhoAreTrainingNow
+);
+
 route.put("/updateAbonements", adminController.UpdateAbonements);
 
 route.post(

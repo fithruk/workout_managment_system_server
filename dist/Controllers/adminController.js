@@ -100,6 +100,15 @@ class AdminController {
                 next(error);
             }
         };
+        this.GetClientsWhoAreTrainingNow = async (req, res, next) => {
+            try {
+                const clients = await adminService_1.default.GetClientsWhoAreTrainingNow();
+                res.status(200).json(clients ?? []);
+            }
+            catch (error) {
+                next(error);
+            }
+        };
     }
 }
 exports.default = new AdminController();

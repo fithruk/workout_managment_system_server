@@ -11,6 +11,7 @@ route.get("/getAllClients", adminMiddleware_1.adminMiddlaware, adminController_1
 route.get("/getCurrentWorkoutPlan/:name/:date", adminMiddleware_1.adminMiddlaware, adminController_1.default.GetCurrentWorkoutPlan);
 route.get("/getAllTimeClients", adminMiddleware_1.adminMiddlaware, adminController_1.default.GetAllTimeClients);
 route.get("/getAllWorkoutPlansForToday", adminMiddleware_1.adminMiddlaware, adminController_1.default.GetAllWorkoutPlansForToday);
+route.get("/getClientsWhoAreTrainingNow", adminMiddleware_1.adminMiddlaware, adminController_1.default.GetClientsWhoAreTrainingNow);
 route.put("/updateAbonements", adminController_1.default.UpdateAbonements);
 route.post("/getTodayClientsAbonements", adminMiddleware_1.adminMiddlaware, adminController_1.default.GetTodayClientsAbonements);
 route.post("/getClientWorkouts", adminMiddleware_1.adminMiddlaware, adminController_1.default.GetClientWorkouts);
