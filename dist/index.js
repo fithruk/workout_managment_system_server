@@ -52,26 +52,61 @@ app.use(errorMiddleware_1.default);
 io.on("connection", (socket) => {
     console.log("Socket connected:", socket.id);
     const socketService = new socketService_1.default(io, socket);
-    socketService.HandShacke();
+    try {
+        socketService.HandShacke();
+    }
+    catch (error) {
+        console.error("Handshake error:", error);
+    }
     socket.on("disconnect", () => {
-        console.log("Socket disconnected:", socket.id);
-        socketService.notifyAdmins();
+        try {
+            console.log("Socket disconnected:", socket.id);
+            socketService.notifyAdmins();
+        }
+        catch (error) {
+            console.error("Disconnect error:", error);
+        }
     });
-    socket.on(types_1.SocketEventsEnum.newClientConnected, (data) => {
-        socketService.NewClientConnected(data);
+    socket.on(types_1.SocketEventsEnum.newClientConnected, () => {
+        try {
+            socketService.NewClientConnected();
+        }
+        catch (error) {
+            console.error("New client error:", error);
+        }
     });
-    //  name: string;
-    //     date: string;
-    //     workoutResult: SetsAndValuesResults;
     socket.on(types_1.SocketEventsEnum.updateWorkout, async (data) => {
-        const parsedData = JSON.parse(data);
-        const updatedWorkout = await socketService.UpdateWorkout(parsedData);
-        if (updatedWorkout)
-            socketService.SendUpdatedWorkoutToAdmin({
-                name: updatedWorkout.clientName,
-                date: updatedWorkout.dateOfWorkout.toString(),
-                workoutResult: Object.fromEntries(updatedWorkout.workoutResult),
-            });
+        try {
+            const parsedData = JSON.parse(data);
+            const updatedWorkout = await socketService.UpdateWorkout(parsedData);
+            if (updatedWorkout) {
+                socketService.SendUpdatedWorkoutToAdmin({
+                    name: updatedWorkout.clientName,
+                    date: updatedWorkout.dateOfWorkout.toString(),
+                    workoutResult: Object.fromEntries(updatedWorkout.workoutResult),
+                });
+            }
+        }
+        catch (error) {
+            console.error("Update workout error:", error);
+        }
+    });
+    socket.on(types_1.SocketEventsEnum.newNotification, async (data) => {
+        try {
+            await socketService.newNotification(data);
+        }
+        catch (error) {
+            console.error("New notification error:", error);
+        }
+    });
+    socket.on(types_1.SocketEventsEnum.markNotificationAsReaded, async (data) => {
+        try {
+            const updNotifs = await socketService.MarkNotificationAsReaded(data);
+            socket.emit(types_1.SocketEventsEnum.loadNotification, JSON.stringify(updNotifs));
+        }
+        catch (error) {
+            console.error("Mark notification error:", error);
+        }
     });
 });
 const start = async () => {

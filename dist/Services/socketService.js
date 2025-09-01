@@ -5,24 +5,27 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const types_1 = require("../Types/types");
 const workoutService_1 = __importDefault(require("./workoutService"));
+const notificationService_1 = __importDefault(require("./notificationService"));
+const userService_1 = __importDefault(require("./userService"));
 class SocketService {
     constructor(io, socket) {
         // Удалить или применять везде
-        this.EmitEvent = (event, msg) => {
-            switch (event) {
-                case types_1.SocketEventsEnum.getClientWhoAreTrainingNow:
-                    this.socket.emit(types_1.SocketEventsEnum.getClientWhoAreTrainingNow, JSON.stringify(msg));
-                    break;
-                default:
-                    break;
-            }
-        };
+        // private EmitEvent = (event: SocketEventsEnum, msg?: EmitEventMsgType) => {
+        //   switch (event) {
+        //     case SocketEventsEnum.getClientWhoAreTrainingNow:
+        //       this.socket.emit(
+        //         SocketEventsEnum.getClientWhoAreTrainingNow,
+        //         JSON.stringify(msg)
+        //       );
+        //       break;
+        //     default:
+        //       break;
+        //   }
+        // };
         this.HandShacke = () => {
             const accessToken = this.socket.handshake.auth.token;
             const userNameFromClient = this.socket.handshake.query.name;
             const userRoleFromClient = this.socket.handshake.query.role;
-            // console.log(`User name from client: ${userNameFromClient}`);
-            // console.log(`User role from client: ${userRoleFromClient}`);
             this.socket.data.userName = userNameFromClient;
             this.socket.data.userRole = userRoleFromClient;
         };
@@ -44,23 +47,17 @@ class SocketService {
             }
             for (const [, apartSocket] of this.io.sockets.sockets) {
                 if (apartSocket.data.userRole === "admin") {
-                    // apartSocket.emit(
-                    //   SocketEventsEnum.getClientWhoAreTrainingNow,
-                    //   JSON.stringify(
-                    //     [...allServerRooms.keys()].filter(
-                    //       (name) =>
-                    //         name !== apartSocket.data.userName && isNotSocketId(name)
-                    //     )
-                    //   )
-                    // );
                     apartSocket.emit(types_1.SocketEventsEnum.getClientWhoAreTrainingNow, JSON.stringify(currentClientsWorkouts));
                 }
             }
         };
-        this.NewClientConnected = (data) => {
-            const roomName = this.socket.data.userName;
-            if (roomName)
-                this.socket.join(roomName);
+        this.NewClientConnected = async () => {
+            const clientName = this.socket.data.userName;
+            const user = await userService_1.default.GetClient(clientName);
+            if (clientName)
+                this.socket.join(clientName);
+            if (user)
+                this.SendNotificationToClient(clientName, user._id);
             this.notifyAdmins();
         };
         this.UpdateWorkout = async (workoutData) => {
@@ -73,6 +70,28 @@ class SocketService {
                     apartSocket.emit(types_1.SocketEventsEnum.sendUpdatedWorkoutToAdmin, JSON.stringify(workoutData));
                 }
             }
+        };
+        this.SendNotificationToClient = async (clientName, userId) => {
+            const notifications = await notificationService_1.default.GetUserNotifications(userId);
+            for (const [, apartSocket] of this.io.sockets.sockets) {
+                console.log(clientName + " clientName");
+                console.log(notifications);
+                if (apartSocket.data.userName === clientName) {
+                    apartSocket.emit(types_1.SocketEventsEnum.loadNotification, JSON.stringify(notifications));
+                }
+            }
+        };
+        this.newNotification = async (data) => {
+            const parcedData = JSON.parse(data);
+            const newNotification = await notificationService_1.default.CrateNewNotification(parcedData);
+            const populated = await newNotification.populate("userId", "name");
+            const clientName = populated.userId.name;
+            await this.SendNotificationToClient(clientName, populated.userId);
+        };
+        this.MarkNotificationAsReaded = async (data) => {
+            const parcedData = JSON.parse(data);
+            const updNotifs = await notificationService_1.default.MarkNotificationAsReaded(parcedData.userId, parcedData.visibleNotifications);
+            return updNotifs;
         };
         (this.io = io), (this.socket = socket);
     }

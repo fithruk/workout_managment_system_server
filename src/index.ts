@@ -55,31 +55,64 @@ app.use(errorMiddlaware);
 
 io.on("connection", (socket) => {
   console.log("Socket connected:", socket.id);
+
   const socketService = new SocketService(io, socket);
 
-  socketService.HandShacke();
+  try {
+    socketService.HandShacke();
+  } catch (error) {
+    console.error("Handshake error:", error);
+  }
 
   socket.on("disconnect", () => {
-    console.log("Socket disconnected:", socket.id);
-    socketService.notifyAdmins();
+    try {
+      console.log("Socket disconnected:", socket.id);
+      socketService.notifyAdmins();
+    } catch (error) {
+      console.error("Disconnect error:", error);
+    }
   });
 
-  socket.on(SocketEventsEnum.newClientConnected, (data) => {
-    socketService.NewClientConnected(data);
+  socket.on(SocketEventsEnum.newClientConnected, () => {
+    try {
+      socketService.NewClientConnected();
+    } catch (error) {
+      console.error("New client error:", error);
+    }
   });
-  //  name: string;
-  //     date: string;
-  //     workoutResult: SetsAndValuesResults;
+
   socket.on(SocketEventsEnum.updateWorkout, async (data) => {
-    const parsedData: SoketUpdateWorkoutType = JSON.parse(data);
+    try {
+      const parsedData: SoketUpdateWorkoutType = JSON.parse(data);
 
-    const updatedWorkout = await socketService.UpdateWorkout(parsedData);
-    if (updatedWorkout)
-      socketService.SendUpdatedWorkoutToAdmin({
-        name: updatedWorkout.clientName,
-        date: updatedWorkout.dateOfWorkout.toString(),
-        workoutResult: Object.fromEntries(updatedWorkout.workoutResult),
-      });
+      const updatedWorkout = await socketService.UpdateWorkout(parsedData);
+      if (updatedWorkout) {
+        socketService.SendUpdatedWorkoutToAdmin({
+          name: updatedWorkout.clientName,
+          date: updatedWorkout.dateOfWorkout.toString(),
+          workoutResult: Object.fromEntries(updatedWorkout.workoutResult),
+        });
+      }
+    } catch (error) {
+      console.error("Update workout error:", error);
+    }
+  });
+
+  socket.on(SocketEventsEnum.newNotification, async (data) => {
+    try {
+      await socketService.newNotification(data);
+    } catch (error) {
+      console.error("New notification error:", error);
+    }
+  });
+
+  socket.on(SocketEventsEnum.markNotificationAsReaded, async (data) => {
+    try {
+      const updNotifs = await socketService.MarkNotificationAsReaded(data);
+      socket.emit(SocketEventsEnum.loadNotification, JSON.stringify(updNotifs));
+    } catch (error) {
+      console.error("Mark notification error:", error);
+    }
   });
 });
 

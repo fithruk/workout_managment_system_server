@@ -54,6 +54,16 @@ class UserService {
         )
     );
   };
+
+  public GetClient = async (clientName: string) => {
+    const client = await userModel.findOne({ name: clientName });
+    return client && client;
+  };
+
+  public GetClientById = async (userId: string) => {
+    const client = await userModel.findOne({ userId });
+    return client && client;
+  };
 }
 
 export default new UserService();
