@@ -1,3 +1,5 @@
+import { Types } from "mongoose";
+
 export type RegistrationDataTypes = {
   contactInfo: {
     email: string;
@@ -80,10 +82,27 @@ export enum SocketEventsEnum {
   newClientConnected = "newClientConnected",
   updateWorkout = "updateWorkout",
   sendUpdatedWorkoutToAdmin = "sendUpdatedWorkoutToAdmin",
+  newNotification = "newNotification",
+  loadNotification = "loadNotification",
+  markNotificationAsReaded = "markNotificationAsReaded",
 }
 
 export type SoketUpdateWorkoutType = {
   name: string;
   date: string;
   workoutResult: SetsAndValuesResults;
+};
+
+export type NotificationType = {
+  userId: Types.ObjectId | string;
+  title: string;
+  message: string;
+};
+
+export type UpdatedNotifications = {
+  message: string;
+  userId: Types.ObjectId;
+  title: string;
+  isRead: boolean;
+  createdAt: Date;
 };

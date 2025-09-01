@@ -39,6 +39,14 @@ class UserService {
             const clients = await userModel_1.default.find();
             return clients.map((client) => new userDTO_1.default(client.name, client.email, client.role, client._id.toString()));
         };
+        this.GetClient = async (clientName) => {
+            const client = await userModel_1.default.findOne({ name: clientName });
+            return client && client;
+        };
+        this.GetClientById = async (userId) => {
+            const client = await userModel_1.default.findOne({ userId });
+            return client && client;
+        };
     }
 }
 exports.default = new UserService();

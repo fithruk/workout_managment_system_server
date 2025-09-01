@@ -8,4 +8,7 @@ var SocketEventsEnum;
     SocketEventsEnum["newClientConnected"] = "newClientConnected";
     SocketEventsEnum["updateWorkout"] = "updateWorkout";
     SocketEventsEnum["sendUpdatedWorkoutToAdmin"] = "sendUpdatedWorkoutToAdmin";
+    SocketEventsEnum["newNotification"] = "newNotification";
+    SocketEventsEnum["loadNotification"] = "loadNotification";
+    SocketEventsEnum["markNotificationAsReaded"] = "markNotificationAsReaded";
 })(SocketEventsEnum || (exports.SocketEventsEnum = SocketEventsEnum = {}));
