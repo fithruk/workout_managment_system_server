@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import workoutService from "../Services/workoutService";
 import { SetsAndValuesResults, WorkoutPlanType } from "../Types/types";
+import ApiError from "../Exeptions/apiExeption";
 
 class WorkoutController {
   public SaveWorkoutPlan = async (
@@ -11,6 +12,30 @@ class WorkoutController {
     try {
       const plan: WorkoutPlanType = req.body;
       await workoutService.SaveWorkoutPlan(plan);
+      res.status(200).send();
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  public DeleteWorkoutPlan = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
+    try {
+      const {
+        clientName,
+        dateOfWorkout,
+      }: { clientName: string; dateOfWorkout: string } = req.body;
+
+      const { acknowledged, deletedCount } =
+        await workoutService.DeleteWorkoutPlan(clientName, dateOfWorkout);
+
+      if (!deletedCount) {
+        throw ApiError.BadRequest("WP does not exist");
+      }
+
       res.status(200).send();
     } catch (error) {
       next(error);

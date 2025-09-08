@@ -319,6 +319,23 @@ class WorkoutService {
       },
     });
   };
+
+  public DeleteWorkoutPlan = async (clientName: string, date: string) => {
+    const start = normalizeToUTCMinute(new Date(date));
+
+    start.setHours(0, 0, 0, 0);
+    const end = normalizeToUTCMinute(start);
+
+    end.setDate(end.getDate() + 1);
+
+    return await WorkoutModel.deleteOne({
+      clientName,
+      dateOfWorkout: {
+        $gte: start,
+        $lt: end,
+      },
+    });
+  };
 }
 
 export default new WorkoutService();
