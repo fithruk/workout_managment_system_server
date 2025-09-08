@@ -22,6 +22,12 @@ router.post(
   workoutController.SaveWorkoutResult
 );
 
+router.delete(
+  "/deleteWorkoutPlan",
+  adminMiddlaware,
+  workoutController.DeleteWorkoutPlan
+);
+
 router.get(
   "/getWorkoutResults/:name/:date",
   authMiddlaware,
