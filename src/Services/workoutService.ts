@@ -17,7 +17,7 @@ class WorkoutService {
     start.setHours(0, 0, 0, 0);
 
     const end = new Date(start);
-    end.setDate(end.getDate() + 1); // следующий день
+    end.setDate(end.getDate() + 1);
 
     const Wplan = await WorkoutModel.findOne({
       clientName,
@@ -28,9 +28,6 @@ class WorkoutService {
     });
 
     if (Wplan) {
-      // (Wplan.workoutPlan as ExerciseType[]) = workoutPlan;
-      // await Wplan.save();
-      // return;
       await Wplan.deleteOne();
     }
 

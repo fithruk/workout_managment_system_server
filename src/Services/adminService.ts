@@ -118,8 +118,7 @@ class AdminService {
       });
 
       const completedWorkouts = workoutsInDateRange.length;
-      const oldDuration = abonement.abonementDuration + 1; // т.к. уже вычли выше
-
+      const oldDuration = abonement.abonementDuration + 1;
       await abonement.save();
 
       console.log(
