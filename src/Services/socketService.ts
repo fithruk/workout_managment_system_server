@@ -9,7 +9,11 @@ import notificationService from "./notificationService";
 import { Types } from "mongoose";
 import userService from "./userService";
 
-type NotificationType = { clientName: string; title: string; message: string };
+type NotificationType = {
+  clientNames: string[];
+  title: string;
+  message: string;
+};
 
 class SocketService {
   io: Server;
@@ -17,21 +21,6 @@ class SocketService {
   constructor(io: Server, socket: Socket) {
     (this.io = io), (this.socket = socket);
   }
-
-  // Удалить или применять везде
-  // private EmitEvent = (event: SocketEventsEnum, msg?: EmitEventMsgType) => {
-  //   switch (event) {
-  //     case SocketEventsEnum.getClientWhoAreTrainingNow:
-  //       this.socket.emit(
-  //         SocketEventsEnum.getClientWhoAreTrainingNow,
-  //         JSON.stringify(msg)
-  //       );
-  //       break;
-
-  //     default:
-  //       break;
-  //   }
-  // };
 
   public HandShacke = () => {
     const accessToken = this.socket.handshake.auth.token;
@@ -128,15 +117,24 @@ class SocketService {
   public newNotification = async (data: string) => {
     const parcedData: NotificationType = JSON.parse(data);
 
-    const newNotification = await notificationService.CrateNewNotification(
-      parcedData
+    const clientNames = parcedData.clientNames;
+
+    await Promise.all(
+      clientNames.map(async (client) => {
+        const newNotification = await notificationService.CrateNewNotification({
+          clientName: client,
+          title: parcedData.title,
+          message: parcedData.message,
+        });
+
+        const populated = await newNotification.populate("userId", "name");
+
+        const clientName = (populated.userId as unknown as { name: string })
+          .name;
+
+        await this.SendNotificationToClient(clientName, populated.userId);
+      })
     );
-
-    const populated = await newNotification.populate("userId", "name");
-
-    const clientName = (populated.userId as unknown as { name: string }).name;
-
-    await this.SendNotificationToClient(clientName, populated.userId);
   };
 
   public MarkNotificationAsReaded = async (data: string) => {

@@ -9,19 +9,6 @@ const notificationService_1 = __importDefault(require("./notificationService"));
 const userService_1 = __importDefault(require("./userService"));
 class SocketService {
     constructor(io, socket) {
-        // Удалить или применять везде
-        // private EmitEvent = (event: SocketEventsEnum, msg?: EmitEventMsgType) => {
-        //   switch (event) {
-        //     case SocketEventsEnum.getClientWhoAreTrainingNow:
-        //       this.socket.emit(
-        //         SocketEventsEnum.getClientWhoAreTrainingNow,
-        //         JSON.stringify(msg)
-        //       );
-        //       break;
-        //     default:
-        //       break;
-        //   }
-        // };
         this.HandShacke = () => {
             const accessToken = this.socket.handshake.auth.token;
             const userNameFromClient = this.socket.handshake.query.name;
@@ -83,10 +70,18 @@ class SocketService {
         };
         this.newNotification = async (data) => {
             const parcedData = JSON.parse(data);
-            const newNotification = await notificationService_1.default.CrateNewNotification(parcedData);
-            const populated = await newNotification.populate("userId", "name");
-            const clientName = populated.userId.name;
-            await this.SendNotificationToClient(clientName, populated.userId);
+            const clientNames = parcedData.clientNames;
+            await Promise.all(clientNames.map(async (client) => {
+                const newNotification = await notificationService_1.default.CrateNewNotification({
+                    clientName: client,
+                    title: parcedData.title,
+                    message: parcedData.message,
+                });
+                const populated = await newNotification.populate("userId", "name");
+                const clientName = populated.userId
+                    .name;
+                await this.SendNotificationToClient(clientName, populated.userId);
+            }));
         };
         this.MarkNotificationAsReaded = async (data) => {
             const parcedData = JSON.parse(data);
