@@ -28,6 +28,12 @@ route.get(
   adminController.GetClientsWhoAreTrainingNow
 );
 
+route.get(
+  "/getAllAbonements",
+  adminMiddlaware,
+  adminController.GettAllAbonements
+);
+
 route.put("/updateAbonements", adminController.UpdateAbonements);
 
 route.post(

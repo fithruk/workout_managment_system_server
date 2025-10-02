@@ -142,6 +142,10 @@ class AdminService {
   public GetClientsWhoAreTrainingNow = async () => {
     return await workoutService.GetClientsWhoAreTrainingNow();
   };
+
+  public GetAllAbonements = async () => {
+    return await dataBaseService.GetAllAbonements();
+  };
 }
 
 export default new AdminService();
