@@ -317,7 +317,7 @@ class StatisticsService {
     };
 
     const dynamics = buildExerciseDynamics(workoutsInRange);
-    console.log(dynamics);
+    return dynamics;
   };
 }
 

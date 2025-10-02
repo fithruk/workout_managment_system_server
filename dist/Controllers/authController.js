@@ -24,6 +24,9 @@ class AuthController {
                     maxAge: 15 * 24 * 60 * 60,
                     httpOnly: true,
                 });
+                res.setHeader("Cache-Control", "no-store, no-cache, must-revalidate, proxy-revalidate");
+                res.setHeader("Pragma", "no-cache");
+                res.setHeader("Expires", "0");
                 res.status(200).json({ user });
             }
             catch (error) {
