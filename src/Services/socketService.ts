@@ -16,6 +16,32 @@ type NotificationType = {
   message: string;
 };
 
+type ExerciseEntry = {
+  date: string;
+  maxWeight: number;
+  avgWeight: number;
+  avgReps: number;
+  tonnage: number;
+};
+
+type TrainingData = Record<string, ExerciseEntry[]>;
+
+type StepProgress = {
+  from: string;
+  to: string;
+  changes: {
+    key: keyof Omit<ExerciseEntry, "date">;
+    diff: number;
+    message: string;
+  }[];
+  summary: string;
+};
+
+type ProgressResult = {
+  exercise: string;
+  steps: StepProgress[];
+};
+
 class SocketService {
   io: Server;
   socket: Socket;
@@ -121,13 +147,96 @@ class SocketService {
     const clientNames = parcedData.clientNames;
 
     if (parcedData.title === "progressStatisticsCurrentAbon") {
-      console.log(parcedData); //  Вот здесь....
       const { clientNames, message } = parcedData;
       const range = +message.split(":")[1];
-      await statisticsService.GetProgressStatisticsbyCurrentAbon(
-        clientNames[0],
-        range
-      );
+      const clientProgressDynamics =
+        await statisticsService.GetProgressStatisticsbyCurrentAbon(
+          clientNames[0],
+          range
+        );
+
+      parcedData.title = "Огляд досягнень на цьому етапі";
+
+      function analyzeProgress(
+        oldWeight: number,
+        oldReps: number,
+        newWeight: number,
+        newReps: number
+      ): string {
+        const weightDiff = newWeight - oldWeight;
+        const repsDiff = newReps - oldReps;
+
+        if (weightDiff > 0 && repsDiff > 0) {
+          return "📈 Відмінний прогрес - зросла і вага, і кількість повторень!";
+        }
+
+        if (
+          (weightDiff > 0 && repsDiff < 0) ||
+          (weightDiff < 0 && repsDiff > 0)
+        ) {
+          return "⚖️ Динаміка розвитку: один показник покращився, інший — адаптується до нових умов.";
+        }
+
+        if (weightDiff < 0 && repsDiff < 0) {
+          return "📉 Регрес - знизилися і вага, і кількість повторень.";
+        }
+
+        return "⚖️ Без змін показники залишилися на тому ж рівні.";
+      }
+
+      function calculateStepProgress(data: TrainingData): string {
+        let output = "";
+
+        for (const [exercise, entries] of Object.entries(data)) {
+          if (entries.length < 2) continue;
+
+          output += `🏋️ Вправа: ${exercise}`;
+
+          for (let i = 1; i < entries.length; i++) {
+            const prev = entries[i - 1];
+            const curr = entries[i];
+            const changes: string[] = [];
+
+            (["maxWeight", "avgWeight", "avgReps", "tonnage"] as const).forEach(
+              (key) => {
+                const diff = curr[key] - prev[key];
+                if (diff !== 0) {
+                  const action = diff > 0 ? "прогресував" : "втратив";
+                  const unit =
+                    key === "maxWeight" || key === "avgWeight"
+                      ? "кг"
+                      : key === "avgReps"
+                      ? "повторень"
+                      : "кг";
+
+                  changes.push(
+                    `• ${key}: (${prev.date} → ${
+                      curr.date
+                    }) ты ${action} на ${Math.round(diff)} ${unit}`
+                  );
+                }
+              }
+            );
+
+            const summary = analyzeProgress(
+              prev.maxWeight,
+              prev.avgReps,
+              curr.maxWeight,
+              curr.avgReps
+            );
+
+            output += `\n📅 ${prev.date} → ${curr.date}\n${changes.join(
+              "\n"
+            )}\n👉 Підсумок: ${summary}\n`;
+          }
+
+          output += "\n";
+        }
+
+        return output.trim();
+      }
+
+      parcedData.message = calculateStepProgress(clientProgressDynamics);
     }
 
     await Promise.all(
