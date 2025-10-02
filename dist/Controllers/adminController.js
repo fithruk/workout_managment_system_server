@@ -109,6 +109,15 @@ class AdminController {
                 next(error);
             }
         };
+        this.GettAllAbonements = async (req, res, next) => {
+            try {
+                const abonements = await adminService_1.default.GetAllAbonements();
+                res.status(200).json(abonements);
+            }
+            catch (error) {
+                next(error);
+            }
+        };
     }
 }
 exports.default = new AdminController();
