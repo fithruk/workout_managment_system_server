@@ -109,6 +109,7 @@ io.on("connection", (socket) => {
   socket.on(SocketEventsEnum.markNotificationAsReaded, async (data) => {
     try {
       const updNotifs = await socketService.MarkNotificationAsReaded(data);
+
       socket.emit(SocketEventsEnum.loadNotification, JSON.stringify(updNotifs));
     } catch (error) {
       console.error("Mark notification error:", error);

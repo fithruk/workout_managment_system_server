@@ -31,44 +31,6 @@ type TonnagePerWorkout = {
 };
 
 class StatisticsService {
-  public GetCommonSatisticsByName = async (clientName: string) => {
-    const [abonement, workoutDates, allWorkouts, allExercises] =
-      await Promise.all([
-        dataBaseService.GetApartAbonementByName(clientName),
-        dataBaseService.GetWorkoutesDatesByName(clientName),
-        workoutService.GetAllWorkoutResults(clientName),
-        exerciseService.GetAllExercises(),
-      ]);
-    const totalReps = allWorkouts.reduce((initial, wk) => {
-      wk.workoutResult.forEach((ex) =>
-        ex.forEach((set) => (initial += set.numberOfreps))
-      );
-      return initial;
-    }, 0);
-
-    const strengthProgression = this.GetStrengthProgression(allWorkouts);
-    const frequentMuscleGroups = this.GetFrequentMuscleGroups(
-      allWorkouts,
-      allExercises as Exercise[]
-    );
-    const maxWeights = this.GetMaxWeights(allWorkouts);
-    const tonnagePerWorkout = this.GetTonnagePerWorkout(
-      allWorkouts,
-      allExercises as Exercise[]
-    );
-
-    return {
-      abonement,
-      totalWorkouts: allWorkouts.length,
-      totalReps,
-      strengthProgression,
-      workoutDates,
-      frequentMuscleGroups,
-      maxWeights,
-      tonnagePerWorkout,
-    };
-  };
-
   private GetStrengthProgression = (allWorkouts: WorkoutData[]) => {
     type VolumeEntry = { date: Date; totalVolume: number };
 
@@ -245,6 +207,117 @@ class StatisticsService {
     );
 
     return workoutData;
+  };
+
+  public GetCommonSatisticsByName = async (clientName: string) => {
+    const [abonement, workoutDates, allWorkouts, allExercises] =
+      await Promise.all([
+        dataBaseService.GetApartAbonementByName(clientName),
+        dataBaseService.GetWorkoutesDatesByName(clientName),
+        workoutService.GetAllWorkoutResults(clientName),
+        exerciseService.GetAllExercises(),
+      ]);
+    const totalReps = allWorkouts.reduce((initial, wk) => {
+      wk.workoutResult.forEach((ex) =>
+        ex.forEach((set) => (initial += set.numberOfreps))
+      );
+      return initial;
+    }, 0);
+
+    const strengthProgression = this.GetStrengthProgression(allWorkouts);
+    const frequentMuscleGroups = this.GetFrequentMuscleGroups(
+      allWorkouts,
+      allExercises as Exercise[]
+    );
+    const maxWeights = this.GetMaxWeights(allWorkouts);
+    const tonnagePerWorkout = this.GetTonnagePerWorkout(
+      allWorkouts,
+      allExercises as Exercise[]
+    );
+
+    return {
+      abonement,
+      totalWorkouts: allWorkouts.length,
+      totalReps,
+      strengthProgression,
+      workoutDates,
+      frequentMuscleGroups,
+      maxWeights,
+      tonnagePerWorkout,
+    };
+  };
+
+  public GetProgressStatisticsbyCurrentAbon = async (
+    clientName: string,
+    lastWorkoutsRange: number
+  ) => {
+    const allWorkout = await workoutService.GetAllWorkoutResults(clientName);
+    // const maxWeights = this.GetMaxWeights(allWorkout);
+
+    const start =
+      allWorkout.length >= lastWorkoutsRange + 3
+        ? allWorkout.length - lastWorkoutsRange + 3
+        : 0;
+    const workoutsInRange = allWorkout.slice(start);
+
+    type SetResult = { weightValue: number; numberOfreps: number };
+
+    type WorkoutDoc = {
+      dateOfWorkout: Date;
+      workoutResult: Map<string, SetResult[]>;
+    };
+
+    type ExerciseStats = {
+      date: string;
+      maxWeight: number;
+      avgWeight: number;
+      avgReps: number;
+      tonnage: number;
+    };
+
+    type ExerciseDynamics = Record<string, ExerciseStats[]>;
+
+    const calcStats = (sets: SetResult[], date: string): ExerciseStats => {
+      const totalReps = sets.reduce((acc, s) => acc + s.numberOfreps, 0);
+      const totalWeight = sets.reduce((acc, s) => acc + s.weightValue, 0);
+      const tonnage = sets.reduce(
+        (acc, s) => acc + s.weightValue * s.numberOfreps,
+        0
+      );
+
+      return {
+        date,
+        maxWeight: Math.max(...sets.map((s) => s.weightValue)),
+        avgWeight: +(totalWeight / sets.length).toFixed(1),
+        avgReps: +(totalReps / sets.length).toFixed(1),
+        tonnage,
+      };
+    };
+
+    const buildExerciseDynamics = (
+      workoutsInRange: WorkoutDoc[]
+    ): ExerciseDynamics => {
+      const result: ExerciseDynamics = {};
+
+      for (const wk of workoutsInRange) {
+        const date = new Date(wk.dateOfWorkout).toISOString().split("T")[0];
+
+        for (const [exercise, sets] of wk.workoutResult.entries()) {
+          const stats = calcStats(sets, date);
+
+          if (!result[exercise]) {
+            result[exercise] = [];
+          }
+
+          result[exercise].push(stats);
+        }
+      }
+
+      return result;
+    };
+
+    const dynamics = buildExerciseDynamics(workoutsInRange);
+    console.log(dynamics);
   };
 }
 

@@ -8,6 +8,7 @@ import workoutService from "./workoutService";
 import notificationService from "./notificationService";
 import { Types } from "mongoose";
 import userService from "./userService";
+import statisticsService from "./statisticsService";
 
 type NotificationType = {
   clientNames: string[];
@@ -102,8 +103,8 @@ class SocketService {
     );
 
     for (const [, apartSocket] of this.io.sockets.sockets) {
-      console.log(clientName + " clientName");
-      console.log(notifications);
+      // console.log(clientName + " clientName");
+      // console.log(notifications);
 
       if (apartSocket.data.userName === clientName) {
         apartSocket.emit(
@@ -118,6 +119,16 @@ class SocketService {
     const parcedData: NotificationType = JSON.parse(data);
 
     const clientNames = parcedData.clientNames;
+
+    if (parcedData.title === "progressStatisticsCurrentAbon") {
+      console.log(parcedData); //  Вот здесь....
+      const { clientNames, message } = parcedData;
+      const range = +message.split(":")[1];
+      await statisticsService.GetProgressStatisticsbyCurrentAbon(
+        clientNames[0],
+        range
+      );
+    }
 
     await Promise.all(
       clientNames.map(async (client) => {
