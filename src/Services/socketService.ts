@@ -201,7 +201,7 @@ class SocketService {
               (key) => {
                 const diff = curr[key] - prev[key];
                 if (diff !== 0) {
-                  const action = diff > 0 ? "прогресував" : "втратив";
+                  const action = diff > 0 ? "додав" : "втратив";
                   const unit =
                     key === "maxWeight" || key === "avgWeight"
                       ? "кг"
