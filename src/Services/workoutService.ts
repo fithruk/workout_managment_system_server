@@ -88,32 +88,6 @@ class WorkoutService {
   //   name: string,
   //   date: Date
   // ) => {
-  //   const normalizedDate = normalizeToUTCMinute(date);
-
-  //   const currentWorkout = await workoutResultModel.findOne({
-  //     clientName: name,
-  //     dateOfWorkout: new Date(normalizedDate),
-  //   });
-
-  //   if (!currentWorkout) {
-  //     const workout = await workoutResultModel.create({
-  //       clientName: name,
-  //       dateOfWorkout: new Date(normalizedDate),
-  //       workoutResult: workoutResult,
-  //     });
-  //     return workout;
-  //   }
-  //   (currentWorkout.workoutResult as unknown as SetsAndValuesResults) =
-  //     workoutResult;
-  //   await currentWorkout.save();
-  //   return currentWorkout;
-  // };
-
-  // public SaveWorkoutResults = async (
-  //   workoutResult: SetsAndValuesResults,
-  //   name: string,
-  //   date: Date
-  // ) => {
   //   // Обнуляем время, чтобы осталась только дата
   //   const onlyDateUTC = new Date(
   //     Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate())
@@ -149,23 +123,22 @@ class WorkoutService {
       Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate()),
     );
 
-    return await workoutResultModel
-      .findOneAndUpdate(
-        { clientName: name, dateOfWorkout: onlyDateUTC },
-        {
-          $set: {
-            workoutResult,
-            clientName: name,
-            dateOfWorkout: onlyDateUTC,
-          },
+    return await workoutResultModel.findOneAndUpdate(
+      { clientName: name, dateOfWorkout: onlyDateUTC },
+      {
+        $set: {
+          workoutResult,
+          clientName: name,
+          dateOfWorkout: onlyDateUTC,
         },
-        {
-          upsert: true,
-          new: true, // вернуть уже обновлённый/созданный документ
-          setDefaultsOnInsert: true,
-        },
-      )
-      .lean(); // если не нужно потом мутировать документ
+      },
+      {
+        upsert: true,
+        new: true, // вернуть уже обновлённый/созданный документ
+        setDefaultsOnInsert: true,
+      },
+    );
+    // если не нужно потом мутировать документ
   };
 
   public GetWorkoutResults = async (
