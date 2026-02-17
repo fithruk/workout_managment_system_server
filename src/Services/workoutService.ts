@@ -54,7 +54,7 @@ class WorkoutService {
 
     if (!Wplans)
       throw ApiError.BadRequest(
-        `Планов тренуваннь на ${start.toLocaleDateString()} немає`
+        `Планов тренуваннь на ${start.toLocaleDateString()} немає`,
       );
 
     return Wplans;
@@ -77,7 +77,7 @@ class WorkoutService {
 
     if (!Wplan)
       throw ApiError.BadRequest(
-        `Плану тренування на ${start.toLocaleDateString()} немає`
+        `Плану тренування на ${start.toLocaleDateString()} немає`,
       );
 
     return Wplan;
@@ -109,40 +109,68 @@ class WorkoutService {
   //   return currentWorkout;
   // };
 
+  // public SaveWorkoutResults = async (
+  //   workoutResult: SetsAndValuesResults,
+  //   name: string,
+  //   date: Date
+  // ) => {
+  //   // Обнуляем время, чтобы осталась только дата
+  //   const onlyDateUTC = new Date(
+  //     Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate())
+  //   );
+
+  //   const currentWorkout = await workoutResultModel.findOne({
+  //     clientName: name,
+  //     dateOfWorkout: onlyDateUTC,
+  //   });
+
+  //   if (!currentWorkout) {
+  //     const workout = await workoutResultModel.create({
+  //       clientName: name,
+  //       dateOfWorkout: onlyDateUTC,
+  //       workoutResult: workoutResult,
+  //     });
+  //     return workout;
+  //   }
+
+  //   // обновляем результат
+  //   (currentWorkout.workoutResult as unknown as SetsAndValuesResults) =
+  //     workoutResult;
+  //   await currentWorkout.save();
+  //   return currentWorkout;
+  // };
+
   public SaveWorkoutResults = async (
     workoutResult: SetsAndValuesResults,
     name: string,
-    date: Date
+    date: Date,
   ) => {
-    // Обнуляем время, чтобы осталась только дата
     const onlyDateUTC = new Date(
-      Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate())
+      Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate()),
     );
 
-    const currentWorkout = await workoutResultModel.findOne({
-      clientName: name,
-      dateOfWorkout: onlyDateUTC,
-    });
-
-    if (!currentWorkout) {
-      const workout = await workoutResultModel.create({
-        clientName: name,
-        dateOfWorkout: onlyDateUTC,
-        workoutResult: workoutResult,
-      });
-      return workout;
-    }
-
-    // обновляем результат
-    (currentWorkout.workoutResult as unknown as SetsAndValuesResults) =
-      workoutResult;
-    await currentWorkout.save();
-    return currentWorkout;
+    return await workoutResultModel
+      .findOneAndUpdate(
+        { clientName: name, dateOfWorkout: onlyDateUTC },
+        {
+          $set: {
+            workoutResult,
+            clientName: name,
+            dateOfWorkout: onlyDateUTC,
+          },
+        },
+        {
+          upsert: true,
+          new: true, // вернуть уже обновлённый/созданный документ
+          setDefaultsOnInsert: true,
+        },
+      )
+      .lean(); // если не нужно потом мутировать документ
   };
 
   public GetWorkoutResults = async (
     clientName: string,
-    dateOfWorkout: Date
+    dateOfWorkout: Date,
   ) => {
     // const normalizedDate = normalizeToUTCMinute(dateOfWorkout);
     const start = normalizeToUTCMinute(dateOfWorkout);
@@ -166,7 +194,7 @@ class WorkoutService {
   public GetWorkoutResultsByRange = async (
     dateOfRangeStart: Date,
     dateOfRangeEnd: Date,
-    clientName: string
+    clientName: string,
   ) => {
     const workoutResults = await workoutResultModel.find({
       clientName,
@@ -190,7 +218,7 @@ class WorkoutService {
   public GetCombinedWorkoutDataByRange = async (
     dateOfRangeStart: Date,
     dateOfRangeEnd: Date,
-    clientName: string
+    clientName: string,
   ) => {
     const combined = await WorkoutModel.aggregate([
       {
@@ -259,7 +287,7 @@ class WorkoutService {
 
   public GetCurrentWorkoutPlan = async (
     clientName: string,
-    dateOfWorkout: Date
+    dateOfWorkout: Date,
   ) => {
     const start = normalizeToUTCMinute(dateOfWorkout);
 
@@ -279,7 +307,7 @@ class WorkoutService {
 
   public GetWeightChangeDynamicsDataByName = async (
     clientName: string,
-    exerciseName: string
+    exerciseName: string,
   ) => {
     const exerciseData = await workoutResultModel.aggregate([
       {
