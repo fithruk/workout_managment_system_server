@@ -58,13 +58,14 @@ io.on("connection", (socket) => {
 
   try {
     socketService.HandShacke();
+    console.log(socket.handshake.query.name + " connected");
   } catch (error) {
     console.error("Handshake error:", error);
   }
 
   socket.on("disconnect", () => {
     try {
-      console.log("Socket disconnected:", socket.id);
+      console.log("Socket disconnected:", socket.handshake.query.name);
       socketService.notifyAdmins();
     } catch (error) {
       console.error("Disconnect error:", error);
