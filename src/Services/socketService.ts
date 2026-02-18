@@ -56,7 +56,6 @@ class SocketService {
     const userRoleFromClient = this.socket.handshake.query.role;
     this.socket.data.userName = userNameFromClient;
     this.socket.data.userRole = userRoleFromClient;
-    console.log(userNameFromClient + " connected");
   };
 
   public notifyAdmins = async () => {
