@@ -54,14 +54,6 @@ app.use(errorMiddlaware);
 // });
 
 io.on("connection", (socket) => {
-  console.log();
-
-  console.log(
-    "Socket connected:",
-    socket.id,
-    " " + socket.handshake.query.name,
-  );
-
   const socketService = new SocketService(io, socket);
 
   try {

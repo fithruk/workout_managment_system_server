@@ -46,7 +46,7 @@ class SocketService {
   io: Server;
   socket: Socket;
   constructor(io: Server, socket: Socket) {
-    (this.io = io), (this.socket = socket);
+    ((this.io = io), (this.socket = socket));
   }
 
   public HandShacke = () => {
@@ -56,6 +56,7 @@ class SocketService {
     const userRoleFromClient = this.socket.handshake.query.role;
     this.socket.data.userName = userNameFromClient;
     this.socket.data.userRole = userRoleFromClient;
+    console.log(userNameFromClient + " connected");
   };
 
   public notifyAdmins = async () => {
@@ -70,7 +71,7 @@ class SocketService {
         const date = new Date();
         const workoutData = await workoutService.GetWorkoutResults(
           clientName,
-          date
+          date,
         );
         if (workoutData) {
           currentClientsWorkouts.push(workoutData);
@@ -84,7 +85,7 @@ class SocketService {
       if (apartSocket.data.userRole === "admin") {
         apartSocket.emit(
           SocketEventsEnum.getClientWhoAreTrainingNow,
-          JSON.stringify(currentClientsWorkouts)
+          JSON.stringify(currentClientsWorkouts),
         );
       }
     }
@@ -103,7 +104,7 @@ class SocketService {
     const workout = await workoutService.SaveWorkoutResults(
       workoutData.workoutResult,
       workoutData.name,
-      new Date(workoutData.date)
+      new Date(workoutData.date),
     );
 
     return workout.toObject();
@@ -114,7 +115,7 @@ class SocketService {
       if (apartSocket.data.userRole === "admin") {
         apartSocket.emit(
           SocketEventsEnum.sendUpdatedWorkoutToAdmin,
-          JSON.stringify(workoutData)
+          JSON.stringify(workoutData),
         );
       }
     }
@@ -122,11 +123,10 @@ class SocketService {
 
   public SendNotificationToClient = async (
     clientName: string,
-    userId: Types.ObjectId
+    userId: Types.ObjectId,
   ) => {
-    const notifications = await notificationService.GetUserNotifications(
-      userId
-    );
+    const notifications =
+      await notificationService.GetUserNotifications(userId);
 
     for (const [, apartSocket] of this.io.sockets.sockets) {
       // console.log(clientName + " clientName");
@@ -135,7 +135,7 @@ class SocketService {
       if (apartSocket.data.userName === clientName) {
         apartSocket.emit(
           SocketEventsEnum.loadNotification,
-          JSON.stringify(notifications)
+          JSON.stringify(notifications),
         );
       }
     }
@@ -152,7 +152,7 @@ class SocketService {
       const clientProgressDynamics =
         await statisticsService.GetProgressStatisticsbyCurrentAbon(
           clientNames[0],
-          range
+          range,
         );
 
       parcedData.title = "Огляд досягнень на цьому етапі";
@@ -161,7 +161,7 @@ class SocketService {
         oldWeight: number,
         oldReps: number,
         newWeight: number,
-        newReps: number
+        newReps: number,
       ): string {
         const weightDiff = newWeight - oldWeight;
         const repsDiff = newReps - oldReps;
@@ -206,27 +206,27 @@ class SocketService {
                     key === "maxWeight" || key === "avgWeight"
                       ? "кг"
                       : key === "avgReps"
-                      ? "повторень"
-                      : "кг";
+                        ? "повторень"
+                        : "кг";
 
                   changes.push(
                     `• ${key}: (${prev.date} → ${
                       curr.date
-                    }) ты ${action} на ${Math.round(diff)} ${unit}`
+                    }) ты ${action} на ${Math.round(diff)} ${unit}`,
                   );
                 }
-              }
+              },
             );
 
             const summary = analyzeProgress(
               prev.maxWeight,
               prev.avgReps,
               curr.maxWeight,
-              curr.avgReps
+              curr.avgReps,
             );
 
             output += `\n📅 ${prev.date} → ${curr.date}\n${changes.join(
-              "\n"
+              "\n",
             )}\n👉 Підсумок: ${summary}\n`;
           }
 
@@ -253,7 +253,7 @@ class SocketService {
           .name;
 
         await this.SendNotificationToClient(clientName, populated.userId);
-      })
+      }),
     );
   };
 
@@ -264,7 +264,7 @@ class SocketService {
     const updNotifs: UpdatedNotifications[] =
       await notificationService.MarkNotificationAsReaded(
         parcedData.userId,
-        parcedData.visibleNotifications
+        parcedData.visibleNotifications,
       );
     return updNotifs;
   };
